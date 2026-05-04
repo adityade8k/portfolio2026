@@ -1,0 +1,400 @@
+{
+  "pages": [
+    {
+      "id": "home",
+      "palette": ["#f7f3e8", "#e23d28", "#1f5fbf", "#f4c430", "#111111"],
+      "blocks": [
+        {
+          "id": "home-title",
+          "type": "content",
+          "subtype": "header",
+          "placement": "hero",
+          "size": "large",
+          "content": { "text": "ADITYA DE", "fontWeight": 700 }
+        },
+        {
+          "id": "home-intro",
+          "type": "content",
+          "subtype": "text",
+          "placement": "center",
+          "size": "wide",
+          "content": {
+            "text": "Creative Technologist and Design Educator working with extended reality interactions, specializing in browser-powered 3D experiences.",
+            "fontWeight": 300
+          }
+        },
+        {
+          "id": "home-projects",
+          "type": "interaction",
+          "placement": "bottomRightLowerLeft",
+          "size": "medium",
+          "content": { "label": "PROJECTS", "fontWeight": 400 },
+          "action": { "type": "state", "target": "projects" }
+        },
+        {
+          "id": "home-about",
+          "type": "interaction",
+          "placement": "topRight",
+          "size": "medium",
+          "content": { "label": "ABOUT", "fontWeight": 400 },
+          "action": { "type": "state", "target": "about" }
+        },
+        {
+          "id": "home-experiments",
+          "type": "interaction",
+          "placement": "bottomRightTop",
+          "size": "shortWide",
+          "content": { "label": "EXPERIMENTS", "fontWeight": 400 },
+          "action": { "type": "state", "target": "experiments" }
+        },
+        {
+          "id": "home-teaching",
+          "type": "interaction",
+          "placement": "bottomRightLowerRight",
+          "size": "medium",
+          "content": { "label": "TEACHING", "fontWeight": 400 },
+          "action": { "type": "state", "target": "teaching" }
+        }
+      ]
+    },
+    {
+      "id": "projects",
+      "blocks": [
+        {
+          "id": "projects-title",
+          "type": "content",
+          "subtype": "header",
+          "placement": "top",
+          "size": "wide",
+          "content": { "text": "PROJECTS" }
+        },
+        {
+          "id": "projects-communion",
+          "type": "interaction",
+          "placement": "left",
+          "size": "large",
+          "content": { "label": "COMMUNION" },
+          "action": { "type": "state", "target": "communion" }
+        },
+        {
+          "id": "projects-astral",
+          "type": "interaction",
+          "placement": "right",
+          "size": "large",
+          "content": { "label": "ASTRAL PROJECTION" },
+          "action": { "type": "state", "target": "astralProjection" }
+        },
+        {
+          "id": "projects-home",
+          "type": "interaction",
+          "placement": "bottom",
+          "size": "medium",
+          "content": { "label": "HOME" },
+          "action": { "type": "state", "target": "home" }
+        }
+      ]
+    },
+    {
+      "id": "communion",
+      "blocks": [
+        {
+          "id": "communion-title",
+          "type": "content",
+          "subtype": "header",
+          "placement": "top",
+          "size": "wide",
+          "content": { "text": "COMMUNION" }
+        },
+        {
+          "id": "communion-text",
+          "type": "content",
+          "subtype": "text",
+          "placement": "left",
+          "size": "tall",
+          "content": {
+            "text": "A browser-based ritual interface exploring sound, shared attention, and spatial interaction."
+          }
+        },
+        {
+          "id": "communion-image",
+          "type": "content",
+          "subtype": "image",
+          "placement": "right",
+          "size": "large",
+          "content": {
+            "src": "/images/communion.jpg",
+            "alt": "Communion project placeholder"
+          }
+        },
+        {
+          "id": "communion-more",
+          "type": "moreInfo",
+          "placement": "bottom",
+          "size": "medium",
+          "content": { "label": "MORE INFO" },
+          "modal": {
+            "title": "Communion",
+            "sections": [
+              {
+                "type": "text",
+                "content": "Communion is a prototype for live browser-based participation, using 3D space as both interface and score."
+              },
+              {
+                "type": "image",
+                "src": "/images/communion.jpg",
+                "caption": "Placeholder project image."
+              }
+            ]
+          }
+        },
+        {
+          "id": "communion-back",
+          "type": "interaction",
+          "placement": "corner",
+          "size": "small",
+          "content": { "label": "BACK" },
+          "action": { "type": "state", "target": "projects" }
+        }
+      ]
+    },
+    {
+      "id": "astralProjection",
+      "blocks": [
+        {
+          "id": "astral-title",
+          "type": "content",
+          "subtype": "header",
+          "placement": "top",
+          "size": "wide",
+          "content": { "text": "ASTRAL PROJECTION" }
+        },
+        {
+          "id": "astral-text",
+          "type": "content",
+          "subtype": "text",
+          "placement": "center",
+          "size": "wide",
+          "content": {
+            "text": "An interactive composition for drifting between layered visual systems and generative sound states."
+          }
+        },
+        {
+          "id": "astral-image",
+          "type": "content",
+          "subtype": "image",
+          "placement": "right",
+          "size": "large",
+          "content": {
+            "src": "/images/astral-projection.jpg",
+            "alt": "Astral Projection project placeholder"
+          }
+        },
+        {
+          "id": "astral-more",
+          "type": "moreInfo",
+          "placement": "bottom",
+          "size": "medium",
+          "content": { "label": "MORE INFO" },
+          "modal": {
+            "title": "Astral Projection",
+            "sections": [
+              {
+                "type": "text",
+                "content": "Astral Projection treats navigation, atmosphere, and interaction as a single compositional system."
+              },
+              {
+                "type": "image",
+                "src": "/images/astral-projection.jpg",
+                "caption": "Placeholder project image."
+              }
+            ]
+          }
+        },
+        {
+          "id": "astral-back",
+          "type": "interaction",
+          "placement": "corner",
+          "size": "small",
+          "content": { "label": "BACK" },
+          "action": { "type": "state", "target": "projects" }
+        }
+      ]
+    },
+    {
+      "id": "experiments",
+      "blocks": [
+        {
+          "id": "experiments-title",
+          "type": "content",
+          "subtype": "header",
+          "placement": "top",
+          "size": "wide",
+          "content": { "text": "EXPERIMENTS", "fontWeight": 700 }
+        },
+        {
+          "id": "experiments-copy",
+          "type": "content",
+          "subtype": "text",
+          "placement": "center",
+          "size": "wide",
+          "content": {
+            "text": "Small browser-native studies in interaction, graphics, sound, and spatial interface behavior.",
+            "fontWeight": 300
+          }
+        },
+        {
+          "id": "experiments-home",
+          "type": "interaction",
+          "placement": "bottom",
+          "size": "medium",
+          "content": { "label": "HOME", "fontWeight": 400 },
+          "action": { "type": "state", "target": "home" }
+        }
+      ]
+    },
+    {
+      "id": "teaching",
+      "blocks": [
+        {
+          "id": "teaching-title",
+          "type": "content",
+          "subtype": "header",
+          "placement": "top",
+          "size": "wide",
+          "content": { "text": "TEACHING", "fontWeight": 700 }
+        },
+        {
+          "id": "teaching-copy",
+          "type": "content",
+          "subtype": "text",
+          "placement": "center",
+          "size": "wide",
+          "content": {
+            "text": "Courses, workshops, and learning tools for creative coding, interaction design, and browser-based 3D.",
+            "fontWeight": 300
+          }
+        },
+        {
+          "id": "teaching-home",
+          "type": "interaction",
+          "placement": "bottom",
+          "size": "medium",
+          "content": { "label": "HOME", "fontWeight": 400 },
+          "action": { "type": "state", "target": "home" }
+        }
+      ]
+    },
+    {
+      "id": "about",
+      "blocks": [
+        {
+          "id": "about-title",
+          "type": "content",
+          "subtype": "header",
+          "placement": "top",
+          "size": "wide",
+          "content": { "text": "ABOUT", "fontWeight": 700 }
+        },
+        {
+          "id": "about-instagram",
+          "type": "interaction",
+          "placement": "topLeftStack1",
+          "size": "small",
+          "content": {
+            "label": "IG",
+            "fontWeight": 700,
+            "iconSrc": "/icons/instagram.svg"
+          },
+          "action": { "type": "link", "url": "https://www.instagram.com/cactus_de/" }
+        },
+        {
+          "id": "about-github",
+          "type": "interaction",
+          "placement": "topLeftStack2",
+          "size": "small",
+          "content": {
+            "label": "GH",
+            "fontWeight": 700,
+            "iconSrc": "/icons/github.svg"
+          },
+          "action": { "type": "link", "url": "https://github.com/adityade8k" }
+        },
+        {
+          "id": "about-linkedin",
+          "type": "interaction",
+          "placement": "topLeftStack3",
+          "size": "small",
+          "content": {
+            "label": "IN",
+            "fontWeight": 700,
+            "iconSrc": "/icons/linkedin.svg"
+          },
+          "action": { "type": "link", "url": "https://www.linkedin.com/in/aditya-de-94222a163/" }
+        },
+        {
+          "id": "about-face",
+          "type": "content",
+          "subtype": "image",
+          "placement": "aboutHeroImage",
+          "size": "medium",
+          "content": {
+            "src": "/images/myFace.png",
+            "alt": "Portrait of Aditya De"
+          }
+        },
+        {
+          "id": "about-copy-tall",
+          "type": "content",
+          "subtype": "text",
+          "placement": "aboutPracticeTop",
+          "size": "wide",
+          "content": {
+            "text": "Aditya's practice explores the juxtaposition of the digital and physical through browser-based 3D interaction, mixed reality experimentation, sound, and real-time creative technology.",
+            "fontWeight": 300
+          }
+        },
+        {
+          "id": "about-resume",
+          "type": "interaction",
+          "placement": "aboutImageBelow",
+          "size": "small",
+          "content": { "label": "RESUME 2026", "fontWeight": 700 },
+          "action": {
+            "type": "link",
+            "url": "/files/ADITYADE_CV_2026.pdf"
+          }
+        },
+        {
+          "id": "about-copy-wide",
+          "type": "content",
+          "subtype": "text",
+          "placement": "aboutTall",
+          "size": "tall",
+          "content": {
+            "text": "As a developer and designer, he builds web-based spatial systems and prototypes mixed reality experiences that reimagine how people engage with space, bodies, and interfaces.",
+            "fontWeight": 300
+          }
+        },
+        {
+          "id": "about-copy-education",
+          "type": "content",
+          "subtype": "text",
+          "placement": "aboutLowerWide",
+          "size": "wide",
+          "content": {
+            "text": "As an educator, he is interested in how AI can be aligned with pedagogy, with a focus on process, experimentation, and learning through making.",
+            "fontWeight": 300
+          }
+        },
+        {
+          "id": "about-home",
+          "type": "interaction",
+          "placement": "bottomCenter",
+          "size": "small",
+          "content": { "label": "HOME", "fontWeight": 700 },
+          "action": { "type": "state", "target": "home" }
+        }
+      ]
+    }
+  ]
+}
