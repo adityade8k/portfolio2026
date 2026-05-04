@@ -59,6 +59,56 @@
     },
     {
       "id": "projects",
+      "projectItems": [
+        {
+          "id": "trainingSimulation",
+          "title": "Training Simulation Application for the Logistics Industry",
+          "thumbnail": "/images/training-simulation.svg",
+          "target": "trainingSimulation"
+        },
+        {
+          "id": "radstore",
+          "title": "Radstore - RadBoards Virtual Store Experience",
+          "thumbnail": "/images/radstore.svg",
+          "target": "radstore"
+        },
+        {
+          "id": "walkthrough3d",
+          "title": "3D Walkthrough Application for Real Estate",
+          "thumbnail": "/images/3d-walkthrough.svg",
+          "target": "walkthrough3d"
+        },
+        {
+          "id": "liveBallData",
+          "title": "Live Ball Data Visualizer for Cricket",
+          "thumbnail": "/images/live-ball-data.svg",
+          "target": "liveBallData"
+        },
+        {
+          "id": "bitsDesignSchoolShowcase2025",
+          "title": "BITS Design School Schowcase 2025",
+          "thumbnail": "/images/bits-design-school-showcase-2025.svg",
+          "target": "bitsDesignSchoolShowcase2025"
+        },
+        {
+          "id": "xrToneSynthesizerBeatSequencer",
+          "title": "XR Tone Synthesizer and Beat Sequencer",
+          "thumbnail": "/images/xr-tone-synthesizer-beat-sequencer.svg",
+          "target": "xrToneSynthesizerBeatSequencer"
+        },
+        {
+          "id": "powaiYear1",
+          "title": "Powai: Year 1",
+          "thumbnail": "/images/powai-year-1.svg",
+          "target": "powaiYear1"
+        },
+        {
+          "id": "natureOfCodeBranchNotebook",
+          "title": "Nature of Code/ Branch Notebook",
+          "thumbnail": "/images/nature-of-code-branch-notebook.svg",
+          "target": "natureOfCodeBranchNotebook"
+        }
+      ],
       "blocks": [
         {
           "id": "projects-title",
@@ -69,33 +119,201 @@
           "content": { "text": "PROJECTS" }
         },
         {
-          "id": "projects-communion",
+          "id": "projects-prev",
           "type": "interaction",
-          "placement": "left",
-          "size": "large",
-          "content": { "label": "COMMUNION" },
-          "action": { "type": "state", "target": "communion" }
+          "placement": "projectPrev",
+          "size": "small",
+          "content": {
+            "label": "PREV",
+            "fontWeight": 700,
+            "iconSrc": "/icons/arrow-left.svg"
+          },
+          "action": { "type": "carousel", "direction": -1 }
         },
         {
-          "id": "projects-astral",
+          "id": "projects-next",
           "type": "interaction",
-          "placement": "right",
-          "size": "large",
-          "content": { "label": "ASTRAL PROJECTION" },
-          "action": { "type": "state", "target": "astralProjection" }
+          "placement": "projectNext",
+          "size": "small",
+          "content": {
+            "label": "NEXT",
+            "fontWeight": 700,
+            "iconSrc": "/icons/arrow-right.svg"
+          },
+          "action": { "type": "carousel", "direction": 1 }
         },
         {
           "id": "projects-home",
           "type": "interaction",
-          "placement": "bottom",
-          "size": "medium",
-          "content": { "label": "HOME" },
+          "placement": "bottomCenter",
+          "size": "small",
+          "content": { "label": "HOME", "fontWeight": 700 },
           "action": { "type": "state", "target": "home" }
         }
       ]
     },
     {
+      "id": "liveBallData",
+      "template": "projectDetail",
+      "projectDetails": {
+        "title": "Live Ball Data Visualizer for Cricket",
+        "image": "/images/live-ball-data.svg",
+        "tags": ["REACT", "THREE.JS", "DATA VIZ", "BROADCAST"],
+        "textBlocks": [
+          "A live cricket ball trajectory visualizer built for StanceBeam while working with Cloudworx Studio in 2024.",
+          "The application fetched ball data from an API and let operators choose animation types, overs, balls, camera transitions, and broadcast overlays for live match analysis."
+        ],
+        "modal": {
+          "title": "Live Ball Data Visualizer for Cricket",
+          "sections": []
+        }
+      }
+    },
+    {
+      "id": "walkthrough3d",
+      "template": "projectDetail",
+      "projectDetails": {
+        "title": "3D Walkthrough Application for Real Estate",
+        "image": "/images/3d-walkthrough.svg",
+        "tags": ["WEB 3D", "VR", "REAL ESTATE", "OPTIMIZATION"],
+        "textBlocks": [
+          "A web-based architectural walkthrough system for exploring interior and real estate models in an immersive browser-native 3D space.",
+          "The project grew from experiments with SketchUp models, VR headsets, mobile navigation, model optimization, and texture baking to balance visual quality with smooth performance."
+        ],
+        "modal": {
+          "title": "3D Walkthrough Application for Real Estate",
+          "sections": []
+        }
+      }
+    },
+    {
+      "id": "radstore",
+      "template": "projectDetail",
+      "projectDetails": {
+        "title": "Radstore - RadBoards Virtual Store Experience",
+        "image": "/images/radstore.svg",
+        "tags": ["THREE.JS", "VIRTUAL STORE", "ECOMMERCE", "JQUERY"],
+        "textBlocks": [
+          "A virtual store experience for RadBoards, a Bangalore-based hoverboard and electric kick scooter brand, developed at Conscious Circle in 2022.",
+          "I built the Three.js frontend, managed 2D product popups with jQuery, and integrated product exploration, video display, image galleries, and cart interactions."
+        ],
+        "modal": {
+          "title": "Radstore - RadBoards Virtual Store Experience",
+          "sections": []
+        }
+      }
+    },
+    {
+      "id": "trainingSimulation",
+      "template": "projectDetail",
+      "projectDetails": {
+        "title": "Training Simulation Application for the Logistics Industry",
+        "image": "/images/training-simulation.svg",
+        "tags": ["THREE.JS", "SIMULATION", "TRAINING", "WEB APP"],
+        "textBlocks": [
+          "A web-based warehouse training simulation prototype for the logistics industry, created during a 2021 internship with Hoansi Studios.",
+          "The prototype simulated receiving workflows with 3D navigation, scanner input, box and pallet interactions, real-time instructions, and an editor for customizing training exercises."
+        ],
+        "modal": {
+          "title": "Training Simulation Application for the Logistics Industry",
+          "sections": []
+        }
+      }
+    },
+    {
+      "id": "bitsDesignSchoolShowcase2025",
+      "template": "projectDetail",
+      "projectDetails": {
+        "title": "BITS Design School Schowcase 2025",
+        "image": "/images/bits-design-school-showcase-2025.svg",
+        "tags": ["SHOWCASE", "WEB", "DESIGN SCHOOL", "2025"],
+        "textBlocks": [
+          "Placeholder project page for BITS Design School Schowcase 2025.",
+          "This space will hold the project context, role, process notes, and final outcomes once the full write-up is ready."
+        ],
+        "modal": {
+          "title": "BITS Design School Schowcase 2025",
+          "sections": []
+        }
+      }
+    },
+    {
+      "id": "xrToneSynthesizerBeatSequencer",
+      "template": "projectDetail",
+      "projectDetails": {
+        "title": "XR Tone Synthesizer and Beat Sequencer",
+        "image": "/images/xr-tone-synthesizer-beat-sequencer.svg",
+        "tags": ["XR", "SOUND", "SYNTH", "SEQUENCER"],
+        "textBlocks": [
+          "Placeholder project page for an XR tone synthesizer and beat sequencer.",
+          "This space will hold interaction details, sound design notes, technical implementation, and documentation once the full write-up is ready."
+        ],
+        "modal": {
+          "title": "XR Tone Synthesizer and Beat Sequencer",
+          "sections": []
+        }
+      }
+    },
+    {
+      "id": "powaiYear1",
+      "template": "projectDetail",
+      "projectDetails": {
+        "title": "Powai: Year 1",
+        "image": "/images/powai-year-1.svg",
+        "tags": ["PLACE", "RESEARCH", "ARCHIVE", "STORYTELLING"],
+        "textBlocks": [
+          "Placeholder project page for Powai: Year 1.",
+          "This space will hold the project narrative, research material, visual documentation, and final reflections once the full write-up is ready."
+        ],
+        "modal": {
+          "title": "Powai: Year 1",
+          "sections": []
+        }
+      }
+    },
+    {
+      "id": "natureOfCodeBranchNotebook",
+      "template": "projectDetail",
+      "projectDetails": {
+        "title": "Nature of Code/ Branch Notebook",
+        "image": "/images/nature-of-code-branch-notebook.svg",
+        "tags": ["GENERATIVE", "NOTEBOOK", "P5.JS", "SYSTEMS"],
+        "textBlocks": [
+          "Placeholder project page for Nature of Code/ Branch Notebook.",
+          "This space will hold experiments, sketches, code studies, and process notes once the full write-up is ready."
+        ],
+        "modal": {
+          "title": "Nature of Code/ Branch Notebook",
+          "sections": []
+        }
+      }
+    },
+    {
       "id": "communion",
+      "template": "projectDetail",
+      "projectDetails": {
+        "title": "COMMUNION",
+        "image": "/images/communion.jpg",
+        "tags": ["WEB 3D", "SOUND", "PARTICIPATION", "RITUAL"],
+        "textBlocks": [
+          "A browser-based ritual interface exploring sound, shared attention, and spatial interaction.",
+          "The project treats interface, score, and environment as one continuous browser-native system."
+        ],
+        "modal": {
+          "title": "Communion",
+          "sections": [
+            {
+              "type": "text",
+              "content": "Communion is a prototype for live browser-based participation, using 3D space as both interface and score."
+            },
+            {
+              "type": "image",
+              "src": "/images/communion.jpg",
+              "caption": "Placeholder project image."
+            }
+          ]
+        }
+      },
       "blocks": [
         {
           "id": "communion-title",
@@ -159,6 +377,30 @@
     },
     {
       "id": "astralProjection",
+      "template": "projectDetail",
+      "projectDetails": {
+        "title": "ASTRAL PROJECTION",
+        "image": "/images/astral-projection.jpg",
+        "tags": ["GENERATIVE", "SOUND", "INTERACTION", "ATMOSPHERE"],
+        "textBlocks": [
+          "An interactive composition for drifting between layered visual systems and generative sound states.",
+          "Astral Projection treats navigation, atmosphere, and interaction as a single compositional system."
+        ],
+        "modal": {
+          "title": "Astral Projection",
+          "sections": [
+            {
+              "type": "text",
+              "content": "Astral Projection treats navigation, atmosphere, and interaction as a single compositional system."
+            },
+            {
+              "type": "image",
+              "src": "/images/astral-projection.jpg",
+              "caption": "Placeholder project image."
+            }
+          ]
+        }
+      },
       "blocks": [
         {
           "id": "astral-title",
@@ -221,7 +463,202 @@
       ]
     },
     {
+      "id": "spatialSketches",
+      "template": "projectDetail",
+      "projectDetails": {
+        "title": "SPATIAL SKETCHES",
+        "image": "/images/spatial-sketches.jpg",
+        "tags": ["PROTOTYPE", "SPATIAL UI", "WEBXR", "STUDY"],
+        "textBlocks": [
+          "Placeholder project page for a browser-native spatial interaction study.",
+          "A set of quick tests for interface behavior, depth, and attention in browser-based 3D."
+        ],
+        "modal": {
+          "title": "Spatial Sketches",
+          "sections": [
+            {
+              "type": "text",
+              "content": "Placeholder detail content for Spatial Sketches."
+            }
+          ]
+        }
+      },
+      "blocks": [
+        {
+          "id": "spatial-sketches-title",
+          "type": "content",
+          "subtype": "header",
+          "placement": "top",
+          "size": "wide",
+          "content": { "text": "SPATIAL SKETCHES", "fontWeight": 700 }
+        },
+        {
+          "id": "spatial-sketches-text",
+          "type": "content",
+          "subtype": "text",
+          "placement": "center",
+          "size": "wide",
+          "content": {
+            "text": "Placeholder project page for a browser-native spatial interaction study.",
+            "fontWeight": 300
+          }
+        },
+        {
+          "id": "spatial-sketches-image",
+          "type": "content",
+          "subtype": "image",
+          "placement": "right",
+          "size": "medium",
+          "content": {
+            "src": "/images/spatial-sketches.jpg",
+            "alt": "Spatial Sketches placeholder"
+          }
+        },
+        {
+          "id": "spatial-sketches-back",
+          "type": "interaction",
+          "placement": "bottomCenter",
+          "size": "small",
+          "content": { "label": "BACK", "fontWeight": 700 },
+          "action": { "type": "state", "target": "projects" }
+        }
+      ]
+    },
+    {
+      "id": "signalGarden",
+      "template": "projectDetail",
+      "projectDetails": {
+        "title": "SIGNAL GARDEN",
+        "image": "/images/signal-garden.jpg",
+        "tags": ["AUDIOVISUAL", "REAL TIME", "INTERFACE", "SYSTEM"],
+        "textBlocks": [
+          "Placeholder project page for a real-time audiovisual interface.",
+          "An experimental system for making signal flow, interaction, and sound visible in the browser."
+        ],
+        "modal": {
+          "title": "Signal Garden",
+          "sections": [
+            {
+              "type": "text",
+              "content": "Placeholder detail content for Signal Garden."
+            }
+          ]
+        }
+      },
+      "blocks": [
+        {
+          "id": "signal-garden-title",
+          "type": "content",
+          "subtype": "header",
+          "placement": "top",
+          "size": "wide",
+          "content": { "text": "SIGNAL GARDEN", "fontWeight": 700 }
+        },
+        {
+          "id": "signal-garden-text",
+          "type": "content",
+          "subtype": "text",
+          "placement": "center",
+          "size": "wide",
+          "content": {
+            "text": "Placeholder project page for a real-time audiovisual interface.",
+            "fontWeight": 300
+          }
+        },
+        {
+          "id": "signal-garden-image",
+          "type": "content",
+          "subtype": "image",
+          "placement": "right",
+          "size": "medium",
+          "content": {
+            "src": "/images/signal-garden.jpg",
+            "alt": "Signal Garden placeholder"
+          }
+        },
+        {
+          "id": "signal-garden-back",
+          "type": "interaction",
+          "placement": "bottomCenter",
+          "size": "small",
+          "content": { "label": "BACK", "fontWeight": 700 },
+          "action": { "type": "state", "target": "projects" }
+        }
+      ]
+    },
+    {
+      "id": "browserRituals",
+      "template": "projectDetail",
+      "projectDetails": {
+        "title": "BROWSER RITUALS",
+        "image": "/images/browser-rituals.jpg",
+        "tags": ["PERFORMANCE", "BROWSER", "CEREMONY", "NETWORK"],
+        "textBlocks": [
+          "Placeholder project page for an experimental web performance system.",
+          "The project uses simple browser primitives to stage shared attention, timing, and mediated presence."
+        ],
+        "modal": {
+          "title": "Browser Rituals",
+          "sections": [
+            {
+              "type": "text",
+              "content": "Placeholder detail content for Browser Rituals."
+            }
+          ]
+        }
+      },
+      "blocks": [
+        {
+          "id": "browser-rituals-title",
+          "type": "content",
+          "subtype": "header",
+          "placement": "top",
+          "size": "wide",
+          "content": { "text": "BROWSER RITUALS", "fontWeight": 700 }
+        },
+        {
+          "id": "browser-rituals-text",
+          "type": "content",
+          "subtype": "text",
+          "placement": "center",
+          "size": "wide",
+          "content": {
+            "text": "Placeholder project page for an experimental web performance system.",
+            "fontWeight": 300
+          }
+        },
+        {
+          "id": "browser-rituals-image",
+          "type": "content",
+          "subtype": "image",
+          "placement": "right",
+          "size": "medium",
+          "content": {
+            "src": "/images/browser-rituals.jpg",
+            "alt": "Browser Rituals placeholder"
+          }
+        },
+        {
+          "id": "browser-rituals-back",
+          "type": "interaction",
+          "placement": "bottomCenter",
+          "size": "small",
+          "content": { "label": "BACK", "fontWeight": 700 },
+          "action": { "type": "state", "target": "projects" }
+        }
+      ]
+    },
+    {
       "id": "experiments",
+      "template": "projectList",
+      "projectItems": [
+        {
+          "id": "experimentPlaceholder",
+          "title": "Experiment Placeholder",
+          "thumbnail": "/images/experiment-placeholder.svg",
+          "target": "experimentPlaceholder"
+        }
+      ],
       "blocks": [
         {
           "id": "experiments-title",
@@ -232,28 +669,68 @@
           "content": { "text": "EXPERIMENTS", "fontWeight": 700 }
         },
         {
-          "id": "experiments-copy",
-          "type": "content",
-          "subtype": "text",
-          "placement": "center",
-          "size": "wide",
+          "id": "experiments-prev",
+          "type": "interaction",
+          "placement": "projectPrev",
+          "size": "small",
           "content": {
-            "text": "Small browser-native studies in interaction, graphics, sound, and spatial interface behavior.",
-            "fontWeight": 300
-          }
+            "label": "PREV",
+            "fontWeight": 700,
+            "iconSrc": "/icons/arrow-left.svg"
+          },
+          "action": { "type": "carousel", "direction": -1 }
+        },
+        {
+          "id": "experiments-next",
+          "type": "interaction",
+          "placement": "projectNext",
+          "size": "small",
+          "content": {
+            "label": "NEXT",
+            "fontWeight": 700,
+            "iconSrc": "/icons/arrow-right.svg"
+          },
+          "action": { "type": "carousel", "direction": 1 }
         },
         {
           "id": "experiments-home",
           "type": "interaction",
-          "placement": "bottom",
-          "size": "medium",
-          "content": { "label": "HOME", "fontWeight": 400 },
+          "placement": "bottomCenter",
+          "size": "small",
+          "content": { "label": "HOME", "fontWeight": 700 },
           "action": { "type": "state", "target": "home" }
         }
       ]
     },
     {
       "id": "teaching",
+      "template": "projectList",
+      "projectItems": [
+        {
+          "id": "habitAndBehaviourLab",
+          "title": "Habit and Behaviour Lab",
+          "thumbnail": "/images/habit-and-behaviour-lab.svg",
+          "target": "habitAndBehaviourLab"
+        },
+        {
+          "id": "architecturalVisualizationVr",
+          "title": "Architectural Visualization in Virtual Reality",
+          "thumbnail": "/images/architectural-visualization-vr.svg",
+          "target": "architecturalVisualizationVr"
+        },
+        {
+          "id": "basicsOfProgramming",
+          "title": "Basics of Programming",
+          "thumbnail": "/images/basics-of-programming.svg",
+          "target": "basicsOfProgramming"
+        },
+        {
+          "id": "threejsWorkshopNyuTandonMakerspaceDesignLab",
+          "title": "Three.js Workshop @ NYU Tandon Makerspace Design Lab",
+          "thumbnail": "/images/threejs-workshop-nyu-tandon-makerspace-design-lab.svg",
+          "target": "threejsWorkshopNyuTandonMakerspaceDesignLab"
+        }
+      ],
       "blocks": [
         {
           "id": "teaching-title",
@@ -264,25 +741,140 @@
           "content": { "text": "TEACHING", "fontWeight": 700 }
         },
         {
-          "id": "teaching-copy",
-          "type": "content",
-          "subtype": "text",
-          "placement": "center",
-          "size": "wide",
+          "id": "teaching-prev",
+          "type": "interaction",
+          "placement": "projectPrev",
+          "size": "small",
           "content": {
-            "text": "Courses, workshops, and learning tools for creative coding, interaction design, and browser-based 3D.",
-            "fontWeight": 300
-          }
+            "label": "PREV",
+            "fontWeight": 700,
+            "iconSrc": "/icons/arrow-left.svg"
+          },
+          "action": { "type": "carousel", "direction": -1 }
+        },
+        {
+          "id": "teaching-next",
+          "type": "interaction",
+          "placement": "projectNext",
+          "size": "small",
+          "content": {
+            "label": "NEXT",
+            "fontWeight": 700,
+            "iconSrc": "/icons/arrow-right.svg"
+          },
+          "action": { "type": "carousel", "direction": 1 }
         },
         {
           "id": "teaching-home",
           "type": "interaction",
-          "placement": "bottom",
-          "size": "medium",
-          "content": { "label": "HOME", "fontWeight": 400 },
+          "placement": "bottomCenter",
+          "size": "small",
+          "content": { "label": "HOME", "fontWeight": 700 },
           "action": { "type": "state", "target": "home" }
         }
       ]
+    },
+    {
+      "id": "experimentPlaceholder",
+      "template": "projectDetail",
+      "projectDetails": {
+        "title": "Experiment Placeholder",
+        "image": "/images/experiment-placeholder.svg",
+        "tags": ["EXPERIMENT", "FILLER", "STUDY", "WEB"],
+        "textBlocks": [
+          "Placeholder experiment page for a small browser-native study.",
+          "This space will hold process notes, technical details, interaction sketches, and documentation once the experiment is ready."
+        ],
+        "modal": {
+          "title": "Experiment Placeholder",
+          "sections": []
+        }
+      }
+    },
+    {
+      "id": "teachingPlaceholder",
+      "template": "projectDetail",
+      "projectDetails": {
+        "title": "Teaching Placeholder",
+        "image": "/images/teaching-placeholder.svg",
+        "tags": ["TEACHING", "FILLER", "WORKSHOP", "PEDAGOGY"],
+        "textBlocks": [
+          "Placeholder teaching page for a course, workshop, or learning tool.",
+          "This space will hold teaching context, learning objectives, session structure, student outcomes, and documentation once the entry is ready."
+        ],
+        "modal": {
+          "title": "Teaching Placeholder",
+          "sections": []
+        }
+      }
+    },
+    {
+      "id": "habitAndBehaviourLab",
+      "template": "projectDetail",
+      "projectDetails": {
+        "title": "Habit and Behaviour Lab",
+        "image": "/images/habit-and-behaviour-lab.svg",
+        "tags": ["RESEARCH", "VR", "EEG", "TEACHING"],
+        "textBlocks": [
+          "A teaching and research engagement with Dr. Sanjukta Ghosh's Habit and Behaviour Lab at Srishti Manipal from November 2022 to April 2024.",
+          "I supported students technically, conducted masterclasses on virtual environments and sensor electronics, helped run EEG experiments, and built web and VR prototypes for the lab."
+        ],
+        "modal": {
+          "title": "Habit and Behaviour Lab",
+          "sections": []
+        }
+      }
+    },
+    {
+      "id": "architecturalVisualizationVr",
+      "template": "projectDetail",
+      "projectDetails": {
+        "title": "Architectural Visualization in Virtual Reality",
+        "image": "/images/architectural-visualization-vr.svg",
+        "tags": ["VR", "ARCHITECTURE", "WEB 3D", "WORKSHOP"],
+        "textBlocks": [
+          "A teaching project focused on using virtual reality to experience architectural spaces and spatial models.",
+          "The project introduced browser-based 3D workflows, model preparation, navigation, and immersive viewing as a way to make architectural visualization more accessible."
+        ],
+        "modal": {
+          "title": "Architectural Visualization in Virtual Reality",
+          "sections": []
+        }
+      }
+    },
+    {
+      "id": "basicsOfProgramming",
+      "template": "projectDetail",
+      "projectDetails": {
+        "title": "Basics of Programming",
+        "image": "/images/basics-of-programming.svg",
+        "tags": ["P5.JS", "CREATIVE CODING", "GENERATIVE ART", "TEACHING"],
+        "textBlocks": [
+          "A creative coding unit for User Interface and Interaction Design students at Srishti Manipal, built around programming with direct visual feedback in p5.js.",
+          "The course introduced Cartesian geometry, loops, randomness, grids, image manipulation, and generative composition through visual exercises and student-led experiments."
+        ],
+        "modal": {
+          "title": "Basics of Programming",
+          "sections": []
+        }
+      }
+    },
+    {
+      "id": "threejsWorkshopNyuTandonMakerspaceDesignLab",
+      "template": "projectDetail",
+      "projectDetails": {
+        "title": "Three.js Workshop @ NYU Tandon Makerspace Design Lab",
+        "image": "/images/threejs-workshop-nyu-tandon-makerspace-design-lab.svg",
+        "tags": ["THREE.JS", "WORKSHOP", "WEB 3D", "TEACHING"],
+        "textBlocks": [
+          "Placeholder teaching page for a Three.js workshop at NYU Tandon Makerspace Design Lab.",
+          "This space will hold the workshop structure, learning goals, examples, participant outcomes, and documentation once the write-up is ready."
+        ],
+        "modal": {
+          "title": "Three.js Workshop @ NYU Tandon Makerspace Design Lab",
+          "sections": []
+        }
+      }
     },
     {
       "id": "about",

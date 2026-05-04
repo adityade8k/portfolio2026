@@ -11,7 +11,7 @@ import { TransitionManager } from './core/transitionManager.js';
 const canvas = document.querySelector('#scene');
 const isMobile = window.innerWidth < 768;
 const fallbackPageId = 'home';
-const fillerRings = 7;
+const fillerRings = 8;
 const floorY = -0.0002;
 const maxDevicePixelRatio = 3;
 const cameraLayoutConfig = {
@@ -36,10 +36,10 @@ const cameraControlsConfig = {
   damping: 0.08,
   minZoom: 1.2,
   maxZoom: 4,
-  minPolarAngle: THREE.MathUtils.degToRad(34),
-  maxPolarAngle: THREE.MathUtils.degToRad(48),
-  minAzimuthAngle: THREE.MathUtils.degToRad(-42),
-  maxAzimuthAngle: THREE.MathUtils.degToRad(42),
+  minPolarAngle: THREE.MathUtils.degToRad(0.5),
+  maxPolarAngle: THREE.MathUtils.degToRad(40),
+  minAzimuthAngle: THREE.MathUtils.degToRad(-45),
+  maxAzimuthAngle: THREE.MathUtils.degToRad(45),
   targetMin: new THREE.Vector3(-2.5, -0.4, -3.8),
   targetMax: new THREE.Vector3(2.5, 1.2, 3.8),
 };
@@ -58,7 +58,7 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 
-const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 100);
+const camera = new THREE.OrthographicCamera(-2, 2, 2, -2, 0.1, 500);
 applyCameraLayout();
 
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -102,15 +102,40 @@ keyLight.shadow.camera.bottom = -8;
 keyLight.shadow.mapSize.set(1024, 1024);
 scene.add(keyLight);
 
+const initialTag = getTagFromUrl();
+if (initialTag) {
+  pagesData.pages.push(createTagProjectPage(initialTag, fallbackPageId));
+}
 const stateManager = new StateManager(pagesData, getInitialPageId());
 const modalManager = new ModalManager();
 const transitionManager = new TransitionManager({ floorY });
 const textureLoader = new THREE.TextureLoader();
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
+const cameraResetTarget = new THREE.Vector3();
+const cameraStartPosition = new THREE.Vector3();
+const cameraEndPosition = new THREE.Vector3();
+const cameraStartTarget = new THREE.Vector3();
+const cameraEndTarget = new THREE.Vector3();
+const cameraStartQuaternion = new THREE.Quaternion();
+const cameraEndQuaternion = new THREE.Quaternion();
+const cameraTargetObject = new THREE.Object3D();
+const cameraResetThresholds = {
+  position: 0.02,
+  target: 0.02,
+  rotationRadians: THREE.MathUtils.degToRad(0.25),
+};
+const projectsPerPage = 3;
+const projectRowSlotCount = 5;
 
+let projectsCarouselPage = 0;
+let previousPageId = fallbackPageId;
 let currentGroup = buildPageGroup(stateManager.getCurrentPage());
 let hoveredMesh = null;
+let cameraResetAnimationId = 0;
+let isCameraResetting = false;
+let isPageTransitioning = false;
+let hasInitializedViewport = false;
 scene.add(currentGroup);
 
 canvas.addEventListener('pointermove', handlePointerMove);
@@ -129,10 +154,15 @@ function resize() {
   camera.right = (layout.viewSize * aspect) / 2;
   camera.top = layout.viewSize / 2;
   camera.bottom = -layout.viewSize / 2;
-  camera.position.copy(layout.position);
-  camera.zoom = layout.zoom;
-  controls.target.copy(layout.target);
-  camera.lookAt(layout.target);
+
+  if (!hasInitializedViewport) {
+    camera.position.copy(layout.position);
+    camera.zoom = layout.zoom;
+    controls.target.copy(layout.target);
+    camera.lookAt(layout.target);
+    hasInitializedViewport = true;
+  }
+
   camera.updateProjectionMatrix();
   controls.update();
 
@@ -141,8 +171,10 @@ function resize() {
 }
 
 function animate() {
-  clampControlsTarget();
-  controls.update();
+  if (!isCameraResetting && !isPageTransitioning) {
+    clampControlsTarget();
+    controls.update();
+  }
   renderer.render(scene, camera);
   requestAnimationFrame(animate);
 }
@@ -152,7 +184,8 @@ resize();
 animate();
 
 function buildPageGroup(page) {
-  const layout = generateLayout(page, { isMobile, fillerRings });
+  const pageForLayout = isProjectListPage(page) ? createProjectsLayoutPage(page) : page;
+  const layout = generateLayout(pageForLayout, { isMobile, fillerRings });
   const group = new THREE.Group();
   group.name = `page-${page.id}`;
 
@@ -164,24 +197,115 @@ function buildPageGroup(page) {
   return group;
 }
 
+function createProjectsLayoutPage(page) {
+  return {
+    ...page,
+    blocks: [...(page.blocks ?? []), ...createProjectCarouselBlocks(page)],
+  };
+}
+
+function buildProjectDynamicGroups(page) {
+  const layout = generateLayout(createProjectsLayoutPage(page), { isMobile, fillerRings });
+  return layout
+    .filter((blockData) => blockData.carouselDynamic)
+    .map((blockData) => createBlock(blockData, textureLoader));
+}
+
+function createProjectCarouselBlocks(page) {
+  const items = getNewestProjectItems(page);
+  const pageCount = Math.max(1, Math.ceil(items.length / projectsPerPage));
+  const pageIndex = clampIndex(projectsCarouselPage, pageCount);
+  const visibleItems = items.slice(pageIndex * projectsPerPage, pageIndex * projectsPerPage + projectsPerPage);
+  const rowSlots = pickProjectRowSlots(visibleItems.length);
+  const blocks = [
+    {
+      id: 'projects-counter',
+      type: 'content',
+      subtype: 'text',
+      carouselDynamic: true,
+      placement: 'projectCounter',
+      size: 'small',
+      content: { text: `${pageIndex + 1}/${pageCount}`, fontWeight: 700, fontSize: 0.32 },
+    },
+  ];
+
+  visibleItems.forEach((item, index) => {
+    const row = rowSlots[index];
+    const thumbnailOnLeft = Math.random() > 0.5;
+    const groupOnRight = Math.random() > 0.5;
+    const titlePlacement = getProjectTitlePlacement(row, { groupOnRight, thumbnailOnLeft });
+    const thumbnailPlacement = getProjectThumbnailPlacement(row, { groupOnRight, thumbnailOnLeft });
+
+    blocks.push(
+      {
+        id: `projects-${item.id}-title`,
+        type: 'interaction',
+        subtype: 'text',
+        carouselDynamic: true,
+        placement: titlePlacement,
+        size: 'shortWide',
+        content: { label: item.title, fontWeight: 400 },
+        action: { type: 'state', target: item.target },
+      },
+      {
+        id: `projects-${item.id}-thumb`,
+        type: 'interaction',
+        subtype: 'image',
+        carouselDynamic: true,
+        placement: thumbnailPlacement,
+        size: 'small',
+        content: {
+          src: item.thumbnail,
+          alt: `${item.title} thumbnail`,
+        },
+        action: { type: 'state', target: item.target },
+      },
+    );
+  });
+
+  return blocks;
+}
+
 async function goToPage(pageId, options = {}) {
   if (transitionManager.isTransitioning || pageId === stateManager.currentPageId) {
     return;
   }
 
+  const lastPageId = stateManager.currentPageId;
   const nextPage = stateManager.goToPage(pageId);
   clearHover();
+  if (!options.preservePrevious) {
+    previousPageId = lastPageId;
+  }
   syncUrlToPage(pageId, { replace: options.replaceUrl ?? false });
 
-  currentGroup = await transitionManager.transitionToPage({
-    oldGroup: currentGroup,
-    newGroupFactory: () => buildPageGroup(nextPage),
-    scene,
-  });
+  const wasControlsEnabled = controls.enabled;
+  controls.enabled = false;
+  isPageTransitioning = true;
+
+  try {
+    currentGroup = await transitionManager.transitionToPage({
+      oldGroup: currentGroup,
+      newGroupFactory: () => buildPageGroup(nextPage),
+      scene,
+      onTransitionStart: ({ duration }) => animateCameraToDefault(duration),
+    });
+  } finally {
+    isPageTransitioning = false;
+    controls.enabled = wasControlsEnabled;
+    syncControlsToCamera();
+  }
 }
 
 function handlePopState() {
   const pageId = getPageIdFromUrl();
+  const tag = getTagFromUrl();
+
+  if (tag) {
+    stateManager.upsertPage(createTagProjectPage(tag, previousPageId));
+    goToPage(getTagPageId(tag), { replaceUrl: true, preservePrevious: true });
+    return;
+  }
 
   if (pageId && stateManager.getPage(pageId)) {
     goToPage(pageId, { replaceUrl: true });
@@ -234,9 +358,123 @@ function handlePointerDown(event) {
     return;
   }
 
+  if (blockData.action?.type === 'tag') {
+    goToTagPage(blockData.action.tag);
+    return;
+  }
+
+  if (blockData.action?.type === 'back') {
+    goToPage(blockData.action.target ?? previousPageId, { preservePrevious: true });
+    return;
+  }
+
+  if (blockData.action?.type === 'carousel') {
+    updateProjectsCarousel(blockData.action.direction);
+    return;
+  }
+
   if (blockData.action?.type === 'link') {
     window.open(blockData.action.url, '_blank', 'noopener,noreferrer');
   }
+}
+
+async function updateProjectsCarousel(direction) {
+  if (transitionManager.isTransitioning || !isProjectListPage(stateManager.getCurrentPage())) {
+    return;
+  }
+
+  const page = stateManager.getCurrentPage();
+  const pageCount = Math.max(1, Math.ceil(getNewestProjectItems(page).length / projectsPerPage));
+
+  if (pageCount <= 1) {
+    return;
+  }
+
+  projectsCarouselPage = (projectsCarouselPage + direction + pageCount) % pageCount;
+  clearHover();
+
+  await transitionManager.replaceChildren({
+    parent: currentGroup,
+    oldChildren: currentGroup.children.filter((child) => child.userData.blockData?.carouselDynamic),
+    newChildren: buildProjectDynamicGroups(page),
+  });
+}
+
+function goToTagPage(tag) {
+  const tagPage = createTagProjectPage(tag, stateManager.currentPageId);
+  stateManager.upsertPage(tagPage);
+  projectsCarouselPage = 0;
+  goToPage(tagPage.id);
+}
+
+function createTagProjectPage(tag, backTarget = fallbackPageId) {
+  const normalizedTag = normalizeTag(tag);
+  const matchingItems = getAllProjectItems().filter((item) =>
+    (item.tags ?? []).some((itemTag) => normalizeTag(itemTag) === normalizedTag),
+  );
+
+  return {
+    id: getTagPageId(tag),
+    template: 'projectList',
+    title: tag.toUpperCase(),
+    projectItems: matchingItems,
+    blocks: [
+      {
+        id: `${getTagPageId(tag)}-back`,
+        type: 'interaction',
+        placement: 'topLeftStack1',
+        size: 'small',
+        content: { label: 'BACK', fontWeight: 700 },
+        action: { type: 'back', target: backTarget },
+      },
+      {
+        id: `${getTagPageId(tag)}-title`,
+        type: 'content',
+        subtype: 'header',
+        placement: 'top',
+        size: 'wide',
+        content: { text: tag.toUpperCase(), fontWeight: 700 },
+      },
+      ...createProjectListNavBlocks(getTagPageId(tag)),
+      {
+        id: `${getTagPageId(tag)}-home`,
+        type: 'interaction',
+        placement: 'bottomCenter',
+        size: 'small',
+        content: { label: 'HOME', fontWeight: 700 },
+        action: { type: 'state', target: 'home' },
+      },
+    ],
+  };
+}
+
+function createProjectListNavBlocks(idPrefix) {
+  return [
+    {
+      id: `${idPrefix}-prev`,
+      type: 'interaction',
+      placement: 'projectPrev',
+      size: 'small',
+      content: {
+        label: 'PREV',
+        fontWeight: 700,
+        iconSrc: '/icons/arrow-left.svg',
+      },
+      action: { type: 'carousel', direction: -1 },
+    },
+    {
+      id: `${idPrefix}-next`,
+      type: 'interaction',
+      placement: 'projectNext',
+      size: 'small',
+      content: {
+        label: 'NEXT',
+        fontWeight: 700,
+        iconSrc: '/icons/arrow-right.svg',
+      },
+      action: { type: 'carousel', direction: 1 },
+    },
+  ];
 }
 
 function getInteractiveHit(event) {
@@ -273,6 +511,11 @@ function getCameraLayout() {
 }
 
 function getInitialPageId() {
+  const tag = getTagFromUrl();
+  if (tag) {
+    return getTagPageId(tag);
+  }
+
   const pageId = getPageIdFromUrl();
   return pageId && pagesData.pages.some((page) => page.id === pageId) ? pageId : fallbackPageId;
 }
@@ -284,6 +527,16 @@ function getPageIdFromUrl() {
   }
 
   return null;
+}
+
+function getTagFromUrl() {
+  const pageId = getPageIdFromUrl();
+
+  if (!pageId?.startsWith('tag:')) {
+    return null;
+  }
+
+  return pageId.slice(4);
 }
 
 function syncUrlToPage(pageId, { replace = false } = {}) {
@@ -301,10 +554,153 @@ function syncUrlToPage(pageId, { replace = false } = {}) {
   }
 }
 
-function resetControlsTarget() {
-  controls.target.copy(getCameraLayout().target);
-  clampControlsTarget();
+function clampIndex(index, count) {
+  return Math.max(0, Math.min(count - 1, index));
+}
+
+function pickProjectRowSlots(count) {
+  const slots = Array.from({ length: projectRowSlotCount }, (_, index) => index + 1);
+
+  for (let index = slots.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    [slots[index], slots[swapIndex]] = [slots[swapIndex], slots[index]];
+  }
+
+  return slots.slice(0, count).sort((a, b) => a - b);
+}
+
+function getProjectTitlePlacement(row, { groupOnRight, thumbnailOnLeft }) {
+  if (groupOnRight && thumbnailOnLeft) {
+    return `projectRow${row}TitleFarRight`;
+  }
+
+  if (thumbnailOnLeft || groupOnRight) {
+    return `projectRow${row}TitleRight`;
+  }
+
+  return `projectRow${row}Title`;
+}
+
+function getProjectThumbnailPlacement(row, { groupOnRight, thumbnailOnLeft }) {
+  if (groupOnRight && thumbnailOnLeft) {
+    return `projectRow${row}ThumbLeftInset`;
+  }
+
+  if (groupOnRight) {
+    return `projectRow${row}ThumbFarRight`;
+  }
+
+  if (thumbnailOnLeft) {
+    return `projectRow${row}ThumbLeft`;
+  }
+
+  return `projectRow${row}Thumb`;
+}
+
+function isProjectListPage(page) {
+  return page?.id === 'projects' || page?.template === 'projectList';
+}
+
+function getAllProjectItems() {
+  const projectsPage = pagesData.pages.find((page) => page.id === 'projects');
+
+  return getNewestProjectItems(projectsPage).map((item) => {
+    const detailPage = pagesData.pages.find((page) => page.id === item.target);
+    return {
+      ...item,
+      tags: detailPage?.projectDetails?.tags ?? item.tags ?? [],
+    };
+  });
+}
+
+function getNewestProjectItems(page) {
+  return [...(page?.projectItems ?? [])].reverse();
+}
+
+function normalizeTag(tag) {
+  return String(tag)
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function getTagPageId(tag) {
+  return `tag:${normalizeTag(tag)}`;
+}
+
+function animateCameraToDefault(duration) {
+  const layout = getCameraLayout();
+  cameraStartPosition.copy(camera.position);
+  cameraEndPosition.copy(layout.position);
+  cameraStartTarget.copy(controls.target);
+  cameraEndTarget.copy(layout.target);
+  cameraStartQuaternion.copy(camera.quaternion);
+  cameraTargetObject.position.copy(layout.position);
+  cameraTargetObject.lookAt(layout.target);
+  cameraEndQuaternion.copy(cameraTargetObject.quaternion);
+
+  if (!hasCameraMovedFromDefault()) {
+    return Promise.resolve();
+  }
+
+  cameraResetAnimationId += 1;
+  const animationId = cameraResetAnimationId;
+  const start = performance.now();
+
+  isCameraResetting = true;
+
+  return new Promise((resolve) => {
+    const finish = () => {
+      camera.position.copy(cameraEndPosition);
+      controls.target.copy(cameraEndTarget);
+      camera.lookAt(cameraEndTarget);
+      isCameraResetting = false;
+      resolve();
+    };
+
+    const tick = (now) => {
+      if (animationId !== cameraResetAnimationId) {
+        isCameraResetting = false;
+        resolve();
+        return;
+      }
+
+      const progress = Math.min(1, (now - start) / Math.max(1, duration));
+      const eased = easeInOutCubic(progress);
+
+      camera.position.lerpVectors(cameraStartPosition, cameraEndPosition, eased);
+      cameraResetTarget.lerpVectors(cameraStartTarget, cameraEndTarget, eased);
+      controls.target.copy(cameraResetTarget);
+      camera.lookAt(cameraResetTarget);
+
+      if (progress >= 1) {
+        finish();
+        return;
+      }
+
+      requestAnimationFrame(tick);
+    };
+
+    requestAnimationFrame(tick);
+  });
+}
+
+function hasCameraMovedFromDefault() {
+  const rotationDelta = 2 * Math.acos(Math.min(1, Math.abs(cameraStartQuaternion.dot(cameraEndQuaternion))));
+
+  return (
+    cameraStartPosition.distanceTo(cameraEndPosition) > cameraResetThresholds.position ||
+    cameraStartTarget.distanceTo(cameraEndTarget) > cameraResetThresholds.target ||
+    rotationDelta > cameraResetThresholds.rotationRadians
+  );
+}
+
+function syncControlsToCamera() {
+  const wasDampingEnabled = controls.enableDamping;
+  controls.enableDamping = false;
   controls.update();
+  controls.enableDamping = wasDampingEnabled;
 }
 
 function clampControlsTarget() {
@@ -323,4 +719,8 @@ function clampControlsTarget() {
     cameraControlsConfig.targetMin.z,
     cameraControlsConfig.targetMax.z,
   );
+}
+
+function easeInOutCubic(t) {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 }

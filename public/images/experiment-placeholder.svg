@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-labelledby="title desc">
+  <title id="title">Experiment Placeholder</title>
+  <desc id="desc">Abstract browser-native experiment placeholder with generative marks and interface panels.</desc>
+  <rect width="1200" height="800" fill="#f7f3e8"/>
+  <rect x="78" y="72" width="1044" height="656" fill="#111111"/>
+  <circle cx="365" cy="320" r="132" fill="#1f5fbf"/>
+  <circle cx="500" cy="420" r="94" fill="#e23d28"/>
+  <rect x="684" y="178" width="310" height="112" fill="#f4c430"/>
+  <rect x="684" y="350" width="230" height="84" fill="#f7f3e8"/>
+  <rect x="684" y="500" width="270" height="84" fill="#d8d2c4"/>
+  <path d="M220 610 C370 514 492 598 612 510 C750 408 842 470 1020 330" fill="none" stroke="#f7f3e8" stroke-width="16" stroke-linecap="round"/>
+</svg>

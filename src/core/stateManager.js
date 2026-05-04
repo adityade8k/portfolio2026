@@ -12,6 +12,11 @@ export class StateManager {
     return this.pages.get(pageId);
   }
 
+  upsertPage(page) {
+    this.pages.set(page.id, page);
+    return page;
+  }
+
   goToPage(pageId) {
     if (!this.pages.has(pageId)) {
       throw new Error(`Unknown page id: ${pageId}`);

@@ -343,6 +343,10 @@ function applyContainFit(texture, width, depth) {
 }
 
 function getFontSize(blockData) {
+  if (blockData.content?.fontSize) {
+    return Number(blockData.content.fontSize);
+  }
+
   if (blockData.subtype === 'header') {
     return Math.min(0.44, blockData.worldW * 0.18);
   }

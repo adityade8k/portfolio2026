@@ -20,7 +20,7 @@ export class TransitionManager {
     this.isTransitioning = false;
   }
 
-  async transitionToPage({ oldGroup, newGroupFactory, scene }) {
+  async transitionToPage({ oldGroup, newGroupFactory, scene, onTransitionStart }) {
     if (this.isTransitioning) {
       return oldGroup;
     }
@@ -30,6 +30,11 @@ export class TransitionManager {
     const newGroup = newGroupFactory();
     scene.add(newGroup);
     this.setGroupProgress(newGroup, 0);
+    const transitionDuration = Math.max(
+      oldGroup ? this.getGroupAnimationDuration(oldGroup) : 0,
+      this.overlapDelay + this.getGroupAnimationDuration(newGroup),
+    );
+    const linkedAnimation = onTransitionStart?.({ duration: transitionDuration }) ?? Promise.resolve();
 
     const exitPromise = oldGroup ? this.animateGroup(oldGroup, 'exit') : Promise.resolve();
     const enterPromise = wait(this.overlapDelay).then(() => this.animateGroup(newGroup, 'enter'));
@@ -40,9 +45,36 @@ export class TransitionManager {
       disposeGroup(oldGroup);
     }
     await enterPromise;
+    await linkedAnimation;
 
     this.isTransitioning = false;
     return newGroup;
+  }
+
+  async replaceChildren({ parent, oldChildren, newChildren }) {
+    if (this.isTransitioning) {
+      return false;
+    }
+
+    this.isTransitioning = true;
+
+    newChildren.forEach((child) => {
+      parent.add(child);
+      this.setGroupProgress(child, 0);
+    });
+
+    const exitPromise = oldChildren.length > 0 ? this.animateObjects(oldChildren, 'exit') : Promise.resolve();
+    const enterPromise = wait(this.overlapDelay).then(() => this.animateObjects(newChildren, 'enter'));
+
+    await exitPromise;
+    oldChildren.forEach((child) => {
+      parent.remove(child);
+      disposeGroup(child);
+    });
+    await enterPromise;
+
+    this.isTransitioning = false;
+    return true;
   }
 
   animateGroup(group, direction) {
@@ -65,6 +97,41 @@ export class TransitionManager {
     });
 
     return Promise.all([centralAnimation, ringAnimation]);
+  }
+
+  animateObjects(objects, direction) {
+    const meshes = objects
+      .flatMap((object) => getBlockMeshes(object))
+      .sort((a, b) => a.getWorldPosition(tempA).x - b.getWorldPosition(tempB).x);
+
+    return this.animateMeshes(meshes, direction, {
+      duration: this.duration,
+      delays: meshes.map((_, index) => index * this.stagger),
+    });
+  }
+
+  getGroupAnimationDuration(group) {
+    const { centralMeshes, ringMeshes } = splitBlockMeshes(group);
+    return Math.max(
+      this.getSteppedAnimationDuration(centralMeshes, this.duration, this.stagger),
+      this.getSpreadAnimationDuration(ringMeshes, this.ringDuration, this.ringDelaySpread),
+    );
+  }
+
+  getSteppedAnimationDuration(meshes, duration, delayStep) {
+    if (meshes.length === 0) {
+      return 0;
+    }
+
+    return duration + (meshes.length - 1) * delayStep;
+  }
+
+  getSpreadAnimationDuration(meshes, duration, delaySpread) {
+    if (meshes.length === 0) {
+      return 0;
+    }
+
+    return duration + delaySpread;
   }
 
   animateMeshes(meshes, direction, { duration, delays }) {

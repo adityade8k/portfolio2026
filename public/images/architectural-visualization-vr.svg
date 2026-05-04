@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-labelledby="title desc">
+  <title id="title">Architectural Visualization in Virtual Reality</title>
+  <desc id="desc">Abstract VR architectural visualization with headset frame and interior grid.</desc>
+  <rect width="1200" height="800" fill="#f7f3e8"/>
+  <rect x="76" y="72" width="1048" height="656" fill="#111111"/>
+  <rect x="180" y="190" width="840" height="330" rx="78" fill="#1f5fbf"/>
+  <circle cx="420" cy="355" r="105" fill="#f7f3e8"/>
+  <circle cx="780" cy="355" r="105" fill="#f7f3e8"/>
+  <polygon points="260,625 940,625 790,420 410,420" fill="#d8d2c4"/>
+  <g stroke="#111111" stroke-width="8" opacity="0.75">
+    <path d="M410 420 V625"/>
+    <path d="M790 420 V625"/>
+    <path d="M338 520 H862"/>
+    <path d="M290 585 H910"/>
+  </g>
+  <path d="M600 610 C555 520 555 470 600 430 C645 470 645 520 600 610Z" fill="none" stroke="#e23d28" stroke-width="14"/>
+</svg>
