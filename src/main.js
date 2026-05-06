@@ -15,25 +15,31 @@ const fallbackPageId = 'home';
 const fillerRings = 8;
 const floorY = -0.0002;
 const maxDevicePixelRatio = 3;
-const cameraLayoutConfig = {
+const defaultCameraConfig = {
   mobile: {
+    cameraY: 8.2,
+    polarAngleDegrees: 40,
+    azimuthAngleDegrees: 32,
     viewSize: 20,
-    position: new THREE.Vector3(2, 6.2, 5),
+    position: new THREE.Vector3(2, 8.2, 5),
     zoom: 0.01,
     target: new THREE.Vector3(0, 0, 0),
   },
   desktop: {
+    cameraY: 6.2,
+    polarAngleDegrees: 40,
+    azimuthAngleDegrees: 25.8,
     viewSize: 8.8,
     position: new THREE.Vector3(3, 6.2, 6.2),
     zoom: 2,
     target: new THREE.Vector3(0, 0, 0),
   },
 };
-const textBlockCameraConfig = {
+const panCameraConfig = {
   // polar is measured down from vertical; azimuth rotates around the scene.
   mobile: {
     viewSize: 17,
-    cameraY: 9.8,
+    cameraY: 8.2,
     polarAngleDegrees: 0.1,
     azimuthAngleDegrees: 0,
     targetY: 0,
@@ -46,19 +52,6 @@ const textBlockCameraConfig = {
     targetY: 0,
   },
 };
-const defaultCameraAngleConfig = {
-  mobile: {
-    cameraY: 8.2,
-    polarAngleDegrees: 29.1,
-    azimuthAngleDegrees: 21.8,
-  },
-  desktop: {
-    cameraY: 6.2,
-    polarAngleDegrees: 40,
-    azimuthAngleDegrees: 25.8,
-  },
-};
-
 const cameraControlsConfig = {
   enabled: true,
   enableRotate: true,
@@ -385,6 +378,10 @@ function handlePointerDown(event) {
     return;
   }
 
+  if (!isPlainTextBlock(blockData)) {
+    animateCameraToDefault(getCameraLerpDuration());
+  }
+
   if (blockData.type === 'moreInfo') {
     modalManager.openModal(blockData.modal);
     return;
@@ -566,18 +563,17 @@ function applyCameraViewSize(viewSize, aspect = window.innerWidth / window.inner
 
 function getCameraLayout() {
   const device = window.innerWidth < 768 ? 'mobile' : 'desktop';
-  const layout = cameraLayoutConfig[device];
-  const angleConfig = defaultCameraAngleConfig[device];
+  const layout = defaultCameraConfig[device];
   const target = layout.target.clone();
 
   return {
     ...layout,
-    position: target.clone().add(getCameraOffsetFromAngles(angleConfig)),
+    position: target.clone().add(getCameraOffsetFromAngles(layout)),
   };
 }
 
-function getTextBlockCameraConfig() {
-  return window.innerWidth < 768 ? textBlockCameraConfig.mobile : textBlockCameraConfig.desktop;
+function getPanCameraConfig() {
+  return window.innerWidth < 768 ? panCameraConfig.mobile : panCameraConfig.desktop;
 }
 
 function getCameraOffsetFromAngles({ cameraY, polarAngleDegrees, azimuthAngleDegrees }) {
@@ -715,7 +711,7 @@ function animateCameraToDefault(duration) {
 }
 
 function animateCameraToTextBlock() {
-  const config = getTextBlockCameraConfig();
+  const config = getPanCameraConfig();
   const polarAngle = THREE.MathUtils.degToRad(config.polarAngleDegrees);
   const cameraRadius = config.cameraY / Math.max(0.001, Math.cos(polarAngle));
 
