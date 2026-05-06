@@ -9,6 +9,7 @@ import { StateManager } from './core/stateManager.js';
 import { TransitionManager } from './core/transitionManager.js';
 
 const canvas = document.querySelector('#scene');
+const cameraDebugOverlay = createCameraDebugOverlay();
 const isMobile = window.innerWidth < 768;
 const fallbackPageId = 'home';
 const fillerRings = 8;
@@ -45,6 +46,19 @@ const textBlockCameraConfig = {
     targetY: 0,
   },
 };
+const defaultCameraAngleConfig = {
+  mobile: {
+    cameraY: 8.2,
+    polarAngleDegrees: 29.1,
+    azimuthAngleDegrees: 21.8,
+  },
+  desktop: {
+    cameraY: 6.2,
+    polarAngleDegrees: 40,
+    azimuthAngleDegrees: 25.8,
+  },
+};
+
 const cameraControlsConfig = {
   enabled: true,
   enableRotate: true,
@@ -142,6 +156,8 @@ const cameraStartQuaternion = new THREE.Quaternion();
 const cameraEndQuaternion = new THREE.Quaternion();
 const cameraTargetObject = new THREE.Object3D();
 const hitFaceNormal = new THREE.Vector3();
+const cameraDebugOffset = new THREE.Vector3();
+const cameraDebugSpherical = new THREE.Spherical();
 const cameraResetThresholds = {
   position: 0.02,
   target: 0.02,
@@ -195,6 +211,7 @@ function animate() {
     clampControlsTarget();
     controls.update();
   }
+  updateCameraDebugOverlay();
   renderer.render(scene, camera);
   requestAnimationFrame(animate);
 }
@@ -548,11 +565,30 @@ function applyCameraViewSize(viewSize, aspect = window.innerWidth / window.inner
 }
 
 function getCameraLayout() {
-  return window.innerWidth < 768 ? cameraLayoutConfig.mobile : cameraLayoutConfig.desktop;
+  const device = window.innerWidth < 768 ? 'mobile' : 'desktop';
+  const layout = cameraLayoutConfig[device];
+  const angleConfig = defaultCameraAngleConfig[device];
+  const target = layout.target.clone();
+
+  return {
+    ...layout,
+    position: target.clone().add(getCameraOffsetFromAngles(angleConfig)),
+  };
 }
 
 function getTextBlockCameraConfig() {
   return window.innerWidth < 768 ? textBlockCameraConfig.mobile : textBlockCameraConfig.desktop;
+}
+
+function getCameraOffsetFromAngles({ cameraY, polarAngleDegrees, azimuthAngleDegrees }) {
+  const polarAngle = THREE.MathUtils.degToRad(polarAngleDegrees);
+  const cameraRadius = cameraY / Math.max(0.001, Math.cos(polarAngle));
+
+  return new THREE.Vector3().setFromSphericalCoords(
+    cameraRadius,
+    polarAngle,
+    THREE.MathUtils.degToRad(azimuthAngleDegrees),
+  );
 }
 
 function getInitialPageId() {
@@ -813,6 +849,34 @@ function clampControlsTarget() {
     cameraControlsConfig.targetMin.z,
     cameraControlsConfig.targetMax.z,
   );
+}
+
+function createCameraDebugOverlay() {
+  const overlay = document.createElement('div');
+  overlay.style.position = 'fixed';
+  overlay.style.right = '12px';
+  overlay.style.top = '12px';
+  overlay.style.zIndex = '20';
+  overlay.style.padding = '8px 10px';
+  overlay.style.background = 'rgba(17, 17, 17, 0.78)';
+  overlay.style.color = '#f7f3e8';
+  overlay.style.fontFamily = 'monospace';
+  overlay.style.fontSize = '12px';
+  overlay.style.lineHeight = '1.45';
+  overlay.style.pointerEvents = 'none';
+  overlay.style.whiteSpace = 'pre';
+  document.body.appendChild(overlay);
+  return overlay;
+}
+
+function updateCameraDebugOverlay() {
+  cameraDebugOffset.copy(camera.position).sub(controls.target);
+  cameraDebugSpherical.setFromVector3(cameraDebugOffset);
+
+  cameraDebugOverlay.textContent = [
+    `polarAngleDegrees: ${THREE.MathUtils.radToDeg(cameraDebugSpherical.phi).toFixed(2)}`,
+    `azimuthAngleDegrees: ${THREE.MathUtils.radToDeg(cameraDebugSpherical.theta).toFixed(2)}`,
+  ].join('\n');
 }
 
 function easeInOutCubic(t) {
