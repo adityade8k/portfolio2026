@@ -28,6 +28,23 @@ const cameraLayoutConfig = {
     target: new THREE.Vector3(0, 0, 0),
   },
 };
+const textBlockCameraConfig = {
+  // polar is measured down from vertical; azimuth rotates around the scene.
+  mobile: {
+    viewSize: 19,
+    cameraY: 9.8,
+    polarAngleDegrees: 0.1,
+    azimuthAngleDegrees: 0,
+    targetY: 0,
+  },
+  desktop: {
+    viewSize: 6.2,
+    cameraY: 9.2,
+    polarAngleDegrees: 2,
+    azimuthAngleDegrees: 0,
+    targetY: 0,
+  },
+};
 const cameraControlsConfig = {
   enabled: true,
   enableRotate: true,
@@ -43,6 +60,8 @@ const cameraControlsConfig = {
   targetMin: new THREE.Vector3(-2.5, -0.4, -3.8),
   targetMax: new THREE.Vector3(2.5, 1.2, 3.8),
 };
+
+let currentCameraViewSize = getCameraLayout().viewSize;
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xf3f0e8);
@@ -113,6 +132,8 @@ const textureLoader = new THREE.TextureLoader();
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
 const cameraResetTarget = new THREE.Vector3();
+const cameraTextTarget = new THREE.Vector3();
+const cameraTextOffset = new THREE.Vector3();
 const cameraStartPosition = new THREE.Vector3();
 const cameraEndPosition = new THREE.Vector3();
 const cameraStartTarget = new THREE.Vector3();
@@ -120,10 +141,12 @@ const cameraEndTarget = new THREE.Vector3();
 const cameraStartQuaternion = new THREE.Quaternion();
 const cameraEndQuaternion = new THREE.Quaternion();
 const cameraTargetObject = new THREE.Object3D();
+const hitFaceNormal = new THREE.Vector3();
 const cameraResetThresholds = {
   position: 0.02,
   target: 0.02,
   rotationRadians: THREE.MathUtils.degToRad(0.25),
+  viewSize: 0.001,
 };
 const projectsPerPage = 3;
 const projectRowSlotCount = 5;
@@ -150,10 +173,7 @@ function resize() {
   const aspect = width / height;
   const layout = getCameraLayout();
 
-  camera.left = (-layout.viewSize * aspect) / 2;
-  camera.right = (layout.viewSize * aspect) / 2;
-  camera.top = layout.viewSize / 2;
-  camera.bottom = -layout.viewSize / 2;
+  applyCameraViewSize(hasInitializedViewport ? currentCameraViewSize : layout.viewSize, aspect);
 
   if (!hasInitializedViewport) {
     camera.position.copy(layout.position);
@@ -353,6 +373,11 @@ function handlePointerDown(event) {
     return;
   }
 
+  if (isPlainTextBlock(blockData)) {
+    animateCameraToTextBlock();
+    return;
+  }
+
   if (blockData.action?.type === 'state') {
     goToPage(blockData.action.target);
     return;
@@ -484,10 +509,16 @@ function getInteractiveHit(event) {
   raycaster.setFromCamera(pointer, camera);
 
   const hits = raycaster.intersectObjects(currentGroup.children, true);
-  return hits.find((hit) => {
-    const blockData = hit.object.userData?.blockData;
-    return blockData?.type === 'interaction' || blockData?.type === 'moreInfo';
-  });
+  const blockHit = hits.find((hit) => hit.object.userData?.isBlockMesh);
+
+  if (!blockHit || !isTopFaceHit(blockHit)) {
+    return null;
+  }
+
+  const blockData = blockHit.object.userData.blockData;
+  return blockData.type === 'interaction' || blockData.type === 'moreInfo' || isPlainTextBlock(blockData)
+    ? blockHit
+    : null;
 }
 
 function clearHover() {
@@ -501,13 +532,27 @@ function clearHover() {
 
 function applyCameraLayout() {
   const layout = getCameraLayout();
+  applyCameraViewSize(layout.viewSize);
   camera.position.copy(layout.position);
   camera.zoom = layout.zoom;
   camera.lookAt(layout.target);
 }
 
+function applyCameraViewSize(viewSize, aspect = window.innerWidth / window.innerHeight) {
+  currentCameraViewSize = viewSize;
+  camera.left = (-viewSize * aspect) / 2;
+  camera.right = (viewSize * aspect) / 2;
+  camera.top = viewSize / 2;
+  camera.bottom = -viewSize / 2;
+  camera.updateProjectionMatrix();
+}
+
 function getCameraLayout() {
   return window.innerWidth < 768 ? cameraLayoutConfig.mobile : cameraLayoutConfig.desktop;
+}
+
+function getTextBlockCameraConfig() {
+  return window.innerWidth < 768 ? textBlockCameraConfig.mobile : textBlockCameraConfig.desktop;
 }
 
 function getInitialPageId() {
@@ -630,7 +675,37 @@ function getTagPageId(tag) {
 }
 
 function animateCameraToDefault(duration) {
-  const layout = getCameraLayout();
+  return animateCameraToLayout(getCameraLayout(), duration);
+}
+
+function animateCameraToTextBlock() {
+  const config = getTextBlockCameraConfig();
+  const polarAngle = THREE.MathUtils.degToRad(config.polarAngleDegrees);
+  const cameraRadius = config.cameraY / Math.max(0.001, Math.cos(polarAngle));
+
+  cameraTextTarget.copy(getCameraLayout().target);
+  cameraTextTarget.y = config.targetY;
+
+  cameraTextOffset.setFromSphericalCoords(
+    cameraRadius,
+    polarAngle,
+    THREE.MathUtils.degToRad(config.azimuthAngleDegrees),
+  );
+
+  return animateCameraToLayout(
+    {
+      viewSize: config.viewSize,
+      position: cameraTextTarget.clone().add(cameraTextOffset),
+      target: cameraTextTarget.clone(),
+    },
+    getCameraLerpDuration(),
+  );
+}
+
+function animateCameraToLayout(layout, duration) {
+  const startViewSize = currentCameraViewSize;
+  const endViewSize = layout.viewSize ?? startViewSize;
+
   cameraStartPosition.copy(camera.position);
   cameraEndPosition.copy(layout.position);
   cameraStartTarget.copy(controls.target);
@@ -640,7 +715,7 @@ function animateCameraToDefault(duration) {
   cameraTargetObject.lookAt(layout.target);
   cameraEndQuaternion.copy(cameraTargetObject.quaternion);
 
-  if (!hasCameraMovedFromDefault()) {
+  if (!hasCameraMovedToLayout(startViewSize, endViewSize)) {
     return Promise.resolve();
   }
 
@@ -655,13 +730,13 @@ function animateCameraToDefault(duration) {
       camera.position.copy(cameraEndPosition);
       controls.target.copy(cameraEndTarget);
       camera.lookAt(cameraEndTarget);
+      applyCameraViewSize(endViewSize);
       isCameraResetting = false;
       resolve();
     };
 
     const tick = (now) => {
       if (animationId !== cameraResetAnimationId) {
-        isCameraResetting = false;
         resolve();
         return;
       }
@@ -673,6 +748,7 @@ function animateCameraToDefault(duration) {
       cameraResetTarget.lerpVectors(cameraStartTarget, cameraEndTarget, eased);
       controls.target.copy(cameraResetTarget);
       camera.lookAt(cameraResetTarget);
+      applyCameraViewSize(THREE.MathUtils.lerp(startViewSize, endViewSize, eased));
 
       if (progress >= 1) {
         finish();
@@ -686,14 +762,32 @@ function animateCameraToDefault(duration) {
   });
 }
 
-function hasCameraMovedFromDefault() {
+function hasCameraMovedToLayout(startViewSize, endViewSize) {
   const rotationDelta = 2 * Math.acos(Math.min(1, Math.abs(cameraStartQuaternion.dot(cameraEndQuaternion))));
 
   return (
     cameraStartPosition.distanceTo(cameraEndPosition) > cameraResetThresholds.position ||
     cameraStartTarget.distanceTo(cameraEndTarget) > cameraResetThresholds.target ||
-    rotationDelta > cameraResetThresholds.rotationRadians
+    rotationDelta > cameraResetThresholds.rotationRadians ||
+    Math.abs(startViewSize - endViewSize) > cameraResetThresholds.viewSize
   );
+}
+
+function getCameraLerpDuration() {
+  return transitionManager.overlapDelay + transitionManager.getGroupAnimationDuration(currentGroup);
+}
+
+function isPlainTextBlock(blockData) {
+  return blockData.type === 'content' && blockData.subtype === 'text';
+}
+
+function isTopFaceHit(hit) {
+  if (!hit.object.userData?.isBlockMesh || !hit.face) {
+    return false;
+  }
+
+  hitFaceNormal.copy(hit.face.normal).transformDirection(hit.object.matrixWorld);
+  return hitFaceNormal.y > 0.9;
 }
 
 function syncControlsToCamera() {

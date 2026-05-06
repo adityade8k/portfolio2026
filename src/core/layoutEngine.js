@@ -55,7 +55,7 @@ export function generateLayout(page, options = {}) {
   const occupancy = createOccupancy(grid.cols, grid.rows);
   const blocks = [];
 
-  for (const authoredBlock of page.blocks ?? []) {
+  for (const authoredBlock of prioritizeBackBlocks(page.blocks ?? [])) {
     const placed = placeAuthoredBlock(authoredBlock, occupancy, grid, palette);
     if (placed) {
       blocks.push(placed);
@@ -95,7 +95,7 @@ function generateProjectDetailLayout(page, grid, palette) {
     gridW: 1,
     gridHUnit: 2,
     content: { label: 'BACK', fontWeight: 700 },
-    action: { type: 'state', target: 'projects' },
+    action: { type: 'back' },
   });
 
   addBlock({
@@ -334,6 +334,14 @@ function placeAuthoredBlock(block, occupancy, grid, palette) {
   }
 
   return null;
+}
+
+function prioritizeBackBlocks(blocks) {
+  return [...blocks].sort((a, b) => Number(isBackBlock(b)) - Number(isBackBlock(a)));
+}
+
+function isBackBlock(block) {
+  return block.action?.type === 'back' || block.content?.label === 'BACK' || block.id?.endsWith('-back');
 }
 
 function createFillerBlocks(occupancy, grid, palette, page) {

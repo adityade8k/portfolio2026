@@ -143,12 +143,12 @@
           "action": { "type": "carousel", "direction": 1 }
         },
         {
-          "id": "projects-home",
+          "id": "projects-back",
           "type": "interaction",
-          "placement": "bottomCenter",
+          "placement": "topLeftStack1",
           "size": "small",
-          "content": { "label": "HOME", "fontWeight": 700 },
-          "action": { "type": "state", "target": "home" }
+          "content": { "label": "BACK", "fontWeight": 700 },
+          "action": { "type": "back", "target": "home" }
         }
       ]
     },
@@ -368,10 +368,10 @@
         {
           "id": "communion-back",
           "type": "interaction",
-          "placement": "corner",
+          "placement": "topLeftStack1",
           "size": "small",
           "content": { "label": "BACK" },
-          "action": { "type": "state", "target": "projects" }
+          "action": { "type": "back" }
         }
       ]
     },
@@ -455,10 +455,10 @@
         {
           "id": "astral-back",
           "type": "interaction",
-          "placement": "corner",
+          "placement": "topLeftStack1",
           "size": "small",
           "content": { "label": "BACK" },
-          "action": { "type": "state", "target": "projects" }
+          "action": { "type": "back" }
         }
       ]
     },
@@ -517,10 +517,10 @@
         {
           "id": "spatial-sketches-back",
           "type": "interaction",
-          "placement": "bottomCenter",
+          "placement": "topLeftStack1",
           "size": "small",
           "content": { "label": "BACK", "fontWeight": 700 },
-          "action": { "type": "state", "target": "projects" }
+          "action": { "type": "back" }
         }
       ]
     },
@@ -579,10 +579,10 @@
         {
           "id": "signal-garden-back",
           "type": "interaction",
-          "placement": "bottomCenter",
+          "placement": "topLeftStack1",
           "size": "small",
           "content": { "label": "BACK", "fontWeight": 700 },
-          "action": { "type": "state", "target": "projects" }
+          "action": { "type": "back" }
         }
       ]
     },
@@ -641,10 +641,10 @@
         {
           "id": "browser-rituals-back",
           "type": "interaction",
-          "placement": "bottomCenter",
+          "placement": "topLeftStack1",
           "size": "small",
           "content": { "label": "BACK", "fontWeight": 700 },
-          "action": { "type": "state", "target": "projects" }
+          "action": { "type": "back" }
         }
       ]
     },
@@ -693,12 +693,12 @@
           "action": { "type": "carousel", "direction": 1 }
         },
         {
-          "id": "experiments-home",
+          "id": "experiments-back",
           "type": "interaction",
-          "placement": "bottomCenter",
+          "placement": "topLeftStack1",
           "size": "small",
-          "content": { "label": "HOME", "fontWeight": 700 },
-          "action": { "type": "state", "target": "home" }
+          "content": { "label": "BACK", "fontWeight": 700 },
+          "action": { "type": "back", "target": "home" }
         }
       ]
     },
@@ -765,12 +765,12 @@
           "action": { "type": "carousel", "direction": 1 }
         },
         {
-          "id": "teaching-home",
+          "id": "teaching-back",
           "type": "interaction",
-          "placement": "bottomCenter",
+          "placement": "topLeftStack1",
           "size": "small",
-          "content": { "label": "HOME", "fontWeight": 700 },
-          "action": { "type": "state", "target": "home" }
+          "content": { "label": "BACK", "fontWeight": 700 },
+          "action": { "type": "back", "target": "home" }
         }
       ]
     },
@@ -890,7 +890,7 @@
         {
           "id": "about-instagram",
           "type": "interaction",
-          "placement": "topLeftStack1",
+          "placement": "bottomRightLowerLeft",
           "size": "small",
           "content": {
             "label": "IG",
@@ -902,7 +902,7 @@
         {
           "id": "about-github",
           "type": "interaction",
-          "placement": "topLeftStack2",
+          "placement": "bottomRight",
           "size": "small",
           "content": {
             "label": "GH",
@@ -914,7 +914,7 @@
         {
           "id": "about-linkedin",
           "type": "interaction",
-          "placement": "topLeftStack3",
+          "placement": "bottomRightLowerRight",
           "size": "small",
           "content": {
             "label": "IN",
@@ -979,12 +979,12 @@
           }
         },
         {
-          "id": "about-home",
+          "id": "about-back",
           "type": "interaction",
-          "placement": "bottomCenter",
+          "placement": "topLeftStack1",
           "size": "small",
-          "content": { "label": "HOME", "fontWeight": 700 },
-          "action": { "type": "state", "target": "home" }
+          "content": { "label": "BACK", "fontWeight": 700 },
+          "action": { "type": "back", "target": "home" }
         }
       ]
     }
