@@ -17,7 +17,7 @@ const maxDevicePixelRatio = 3;
 const cameraLayoutConfig = {
   mobile: {
     viewSize: 20,
-    position: new THREE.Vector3(2, 8.2, 5),
+    position: new THREE.Vector3(2, 6.2, 5),
     zoom: 0.01,
     target: new THREE.Vector3(0, 0, 0),
   },
