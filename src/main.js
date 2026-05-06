@@ -20,7 +20,7 @@ const defaultCameraConfig = {
     cameraY: 8.2,
     polarAngleDegrees: 40,
     azimuthAngleDegrees: 32,
-    viewSize: 20,
+    viewSize: 22,
     position: new THREE.Vector3(2, 8.2, 5),
     zoom: 0.01,
     target: new THREE.Vector3(0, 0, 0),
