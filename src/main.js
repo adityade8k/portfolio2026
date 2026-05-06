@@ -16,7 +16,7 @@ const floorY = -0.0002;
 const maxDevicePixelRatio = 3;
 const cameraLayoutConfig = {
   mobile: {
-    viewSize: 22,
+    viewSize: 20,
     position: new THREE.Vector3(2, 8.2, 5),
     zoom: 0.01,
     target: new THREE.Vector3(0, 0, 0),
@@ -31,7 +31,7 @@ const cameraLayoutConfig = {
 const textBlockCameraConfig = {
   // polar is measured down from vertical; azimuth rotates around the scene.
   mobile: {
-    viewSize: 19,
+    viewSize: 17,
     cameraY: 9.8,
     polarAngleDegrees: 0.1,
     azimuthAngleDegrees: 0,
