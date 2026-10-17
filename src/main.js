@@ -7,12 +7,15 @@ import { generateLayout } from './core/layoutEngine.js';
 import { ModalManager } from './core/modalManager.js';
 import { StateManager } from './core/stateManager.js';
 import { TransitionManager } from './core/transitionManager.js';
+import { getNewestProjectItems, getProjectNavigation, resolveCategoryPageId } from './core/projectNavigation.js';
+import { createProjectGallery, getProjectTilePosition, getProjectNavigationBlocks } from './core/projectGallery.js';
+import { InfiniteGrid } from './core/infiniteGrid.js';
 
 const canvas = document.querySelector('#scene');
 const cameraDebugOverlay = createCameraDebugOverlay();
 const isMobile = window.innerWidth < 768;
 const fallbackPageId = 'home';
-const fillerRings = 8;
+const fillerRings = 0;
 const floorY = -0.0002;
 const maxDevicePixelRatio = 3;
 const defaultCameraConfig = {
@@ -68,6 +71,12 @@ const cameraControlsConfig = {
   targetMax: new THREE.Vector3(2.5, 1.2, 3.8),
 };
 
+const initialTag = getTagFromUrl();
+if (initialTag) {
+  pagesData.pages.push(createTagProjectPage(initialTag, fallbackPageId));
+}
+const stateManager = new StateManager(pagesData, getInitialPageId());
+
 let currentCameraViewSize = getCameraLayout().viewSize;
 
 const scene = new THREE.Scene();
@@ -104,7 +113,7 @@ controls.target.copy(getCameraLayout().target);
 controls.update();
 
 const floor = new THREE.Mesh(
-  new THREE.PlaneGeometry(58, 58),
+  new THREE.PlaneGeometry(200, 200),
   new THREE.MeshStandardMaterial({
     color: 0xf3f0e8,
     roughness: 0.82,
@@ -127,12 +136,10 @@ keyLight.shadow.camera.top = 8;
 keyLight.shadow.camera.bottom = -8;
 keyLight.shadow.mapSize.set(1024, 1024);
 scene.add(keyLight);
+scene.add(keyLight.target);
+const infiniteGrid = new InfiniteGrid();
+scene.add(infiniteGrid);
 
-const initialTag = getTagFromUrl();
-if (initialTag) {
-  pagesData.pages.push(createTagProjectPage(initialTag, fallbackPageId));
-}
-const stateManager = new StateManager(pagesData, getInitialPageId());
 const modalManager = new ModalManager();
 const transitionManager = new TransitionManager({ floorY });
 const textureLoader = new THREE.TextureLoader();
@@ -168,6 +175,7 @@ let cameraResetAnimationId = 0;
 let isCameraResetting = false;
 let isPageTransitioning = false;
 let hasInitializedViewport = false;
+let queuedNavigation = null;
 scene.add(currentGroup);
 
 canvas.addEventListener('pointermove', handlePointerMove);
@@ -180,9 +188,13 @@ function resize() {
   const width = window.innerWidth;
   const height = window.innerHeight;
   const aspect = width / height;
-  const layout = getCameraLayout();
+  const layout = getCameraLayout(camera.zoom);
 
-  applyCameraViewSize(hasInitializedViewport ? currentCameraViewSize : layout.viewSize, aspect);
+  const isGallery = Boolean(currentGroup.userData.categoryId);
+  const viewSize = isGallery && hasInitializedViewport
+    ? layout.viewSize
+    : hasInitializedViewport ? currentCameraViewSize : layout.viewSize;
+  applyCameraViewSize(viewSize, aspect);
 
   if (!hasInitializedViewport) {
     camera.position.copy(layout.position);
@@ -205,6 +217,12 @@ function animate() {
     controls.update();
   }
   updateCameraDebugOverlay();
+  // The light and floor travel with the viewport along the full gallery.
+  floor.position.x = controls.target.x;
+  floor.position.z = controls.target.z;
+  keyLight.position.set(controls.target.x + 4, 8, controls.target.z + 6);
+  keyLight.target.position.set(controls.target.x, 0, controls.target.z);
+  infiniteGrid.update(camera);
   renderer.render(scene, camera);
   requestAnimationFrame(animate);
 }
@@ -214,13 +232,41 @@ resize();
 animate();
 
 function buildPageGroup(page) {
-  const pageForLayout = isProjectListPage(page) ? createProjectsLayoutPage(page) : page;
+  const projectNavigation = getProjectNavigation(pagesData.pages, page.id);
+  if (projectNavigation) {
+    const backTarget = previousPageId.startsWith('tag:') ? previousPageId : fallbackPageId;
+    const gallery = createProjectGallery(pagesData.pages, projectNavigation.categoryId, (projectPage, navigation) =>
+      buildSinglePageGroup({
+        ...projectPage,
+        projectNavigation: { ...navigation, backTarget },
+      }, { galleryTile: true }),
+    );
+    for (const [pageId, tile] of gallery.userData.projectTiles) {
+      const active = pageId === page.id;
+      for (const block of getProjectNavigationBlocks(tile)) {
+        block.userData.mesh.userData.skipPageTransition = !active;
+        transitionManager.setGroupProgress(block, active ? 1 : 0);
+      }
+    }
+    return gallery;
+  }
+
+  return buildSinglePageGroup(page);
+}
+
+function buildSinglePageGroup(page, { galleryTile = false } = {}) {
+  const pageForLayout = isProjectListPage(page)
+    ? createProjectsLayoutPage(page)
+    : page;
   const layout = generateLayout(pageForLayout, { isMobile, fillerRings });
   const group = new THREE.Group();
   group.name = `page-${page.id}`;
 
   layout.forEach((blockData) => {
-    group.add(createBlock(blockData, textureLoader));
+    group.add(createBlock(
+      galleryTile ? { ...blockData, projectPageId: page.id } : blockData,
+      textureLoader,
+    ));
   });
 
   group.updateMatrixWorld(true);
@@ -297,14 +343,22 @@ function createProjectCarouselBlocks(page) {
 }
 
 async function goToPage(pageId, options = {}) {
-  if (transitionManager.isTransitioning || pageId === stateManager.currentPageId) {
+  pageId = resolveCategoryPageId(pagesData.pages, pageId);
+  if (transitionManager.isTransitioning || isPageTransitioning) {
+    queuedNavigation = { pageId, options };
+    return;
+  }
+  if (pageId === stateManager.currentPageId) {
+    syncUrlToPage(pageId, { replace: options.replaceUrl ?? false });
     return;
   }
 
+  const navigation = getProjectNavigation(pagesData.pages, pageId);
+  const staysInGallery = navigation && currentGroup.userData.categoryId === navigation.categoryId;
   const lastPageId = stateManager.currentPageId;
   const nextPage = stateManager.goToPage(pageId);
   clearHover();
-  if (!options.preservePrevious) {
+  if (!options.preservePrevious && !staysInGallery) {
     previousPageId = lastPageId;
   }
   syncUrlToPage(pageId, { replace: options.replaceUrl ?? false });
@@ -314,16 +368,31 @@ async function goToPage(pageId, options = {}) {
   isPageTransitioning = true;
 
   try {
-    currentGroup = await transitionManager.transitionToPage({
-      oldGroup: currentGroup,
-      newGroupFactory: () => buildPageGroup(nextPage),
-      scene,
-      onTransitionStart: ({ duration }) => animateCameraToDefault(duration),
-    });
+    if (staysInGallery) {
+      // Lower only the navigation; the projects and background stay in place.
+      const distance = controls.target.distanceTo(getCameraLayout().target);
+      await transitionManager.transitionNavigation({
+        oldControls: getProjectNavigationBlocks(currentGroup.userData.projectTiles.get(lastPageId)),
+        newControls: getProjectNavigationBlocks(currentGroup.userData.projectTiles.get(pageId)),
+        moveCamera: () => animateCameraToDefault(Math.min(1800, 650 + distance * 18)),
+      });
+    } else {
+      currentGroup = await transitionManager.transitionToPage({
+        oldGroup: currentGroup,
+        newGroupFactory: () => buildPageGroup(nextPage),
+        scene,
+        onTransitionStart: ({ duration }) => animateCameraToDefault(duration),
+      });
+    }
   } finally {
     isPageTransitioning = false;
     controls.enabled = wasControlsEnabled;
     syncControlsToCamera();
+    if (queuedNavigation) {
+      const queued = queuedNavigation;
+      queuedNavigation = null;
+      void goToPage(queued.pageId, queued.options);
+    }
   }
 }
 
@@ -346,7 +415,7 @@ function handlePopState() {
 }
 
 function handlePointerMove(event) {
-  if (transitionManager.isTransitioning) {
+  if (transitionManager.isTransitioning || isPageTransitioning) {
     return;
   }
 
@@ -367,7 +436,7 @@ function handlePointerMove(event) {
 }
 
 function handlePointerDown(event) {
-  if (transitionManager.isTransitioning) {
+  if (transitionManager.isTransitioning || isPageTransitioning) {
     return;
   }
 
@@ -375,6 +444,31 @@ function handlePointerDown(event) {
   const blockData = hit?.object.userData.blockData;
 
   if (!blockData) {
+    return;
+  }
+
+  if (blockData.projectPageId && blockData.projectPageId !== stateManager.currentPageId) {
+    goToPage(blockData.projectPageId, { preservePrevious: true });
+    return;
+  }
+
+  if (blockData.action?.type === 'state') {
+    goToPage(blockData.action.target);
+    return;
+  }
+
+  if (blockData.action?.type === 'project') {
+    goToPage(blockData.action.target, { preservePrevious: true });
+    return;
+  }
+
+  if (blockData.action?.type === 'tag') {
+    goToTagPage(blockData.action.tag);
+    return;
+  }
+
+  if (blockData.action?.type === 'back') {
+    goToPage(blockData.action.target ?? previousPageId, { preservePrevious: true });
     return;
   }
 
@@ -389,21 +483,6 @@ function handlePointerDown(event) {
 
   if (isPlainTextBlock(blockData)) {
     animateCameraToTextBlock();
-    return;
-  }
-
-  if (blockData.action?.type === 'state') {
-    goToPage(blockData.action.target);
-    return;
-  }
-
-  if (blockData.action?.type === 'tag') {
-    goToTagPage(blockData.action.tag);
-    return;
-  }
-
-  if (blockData.action?.type === 'back') {
-    goToPage(blockData.action.target ?? previousPageId, { preservePrevious: true });
     return;
   }
 
@@ -523,14 +602,15 @@ function getInteractiveHit(event) {
   raycaster.setFromCamera(pointer, camera);
 
   const hits = raycaster.intersectObjects(currentGroup.children, true);
-  const blockHit = hits.find((hit) => hit.object.userData?.isBlockMesh);
+  const blockHit = hits.find((hit) => hit.object.userData?.isBlockMesh && hit.object.scale.y > 0.01);
 
   if (!blockHit || !isTopFaceHit(blockHit)) {
     return null;
   }
 
   const blockData = blockHit.object.userData.blockData;
-  return blockData.type === 'interaction' || blockData.type === 'moreInfo' || isPlainTextBlock(blockData)
+  const isNeighbor = blockData.projectPageId && blockData.projectPageId !== stateManager.currentPageId;
+  return (isNeighbor && blockData.type !== 'filler') || blockData.type === 'interaction' || blockData.type === 'moreInfo' || isPlainTextBlock(blockData)
     ? blockHit
     : null;
 }
@@ -561,14 +641,33 @@ function applyCameraViewSize(viewSize, aspect = window.innerWidth / window.inner
   camera.updateProjectionMatrix();
 }
 
-function getCameraLayout() {
+function getCameraLayout(currentZoom) {
   const device = window.innerWidth < 768 ? 'mobile' : 'desktop';
   const layout = defaultCameraConfig[device];
   const target = layout.target.clone();
+  const projectNavigation = getProjectNavigation(pagesData.pages, stateManager.currentPageId);
+  if (projectNavigation) {
+    target.add(getProjectTilePosition(projectNavigation.index));
+    target.y = 0.6;
+  }
+  const aspect = window.innerWidth / window.innerHeight;
+  const initialZoom = Math.max(layout.zoom, cameraControlsConfig.minZoom);
+  const framingZoom = currentZoom ?? initialZoom;
+  const detailViewSize = Math.max(
+    12.8 * framingZoom,
+    (12.4 * framingZoom) / aspect,
+  );
+  const cameraOffset = getCameraOffsetFromAngles(layout);
+  // Orthographic distance does not change zoom; this prevents the raised grid
+  // from crossing the camera's near plane on tall screens.
+  if (projectNavigation) cameraOffset.multiplyScalar(3);
 
   return {
     ...layout,
-    position: target.clone().add(getCameraOffsetFromAngles(layout)),
+    // Keep the active project large; neighboring tiles continue outside the frame.
+    viewSize: projectNavigation ? detailViewSize : layout.viewSize,
+    target,
+    position: target.clone().add(cameraOffset),
   };
 }
 
@@ -594,7 +693,9 @@ function getInitialPageId() {
   }
 
   const pageId = getPageIdFromUrl();
-  return pageId && pagesData.pages.some((page) => page.id === pageId) ? pageId : fallbackPageId;
+  return pageId && pagesData.pages.some((page) => page.id === pageId)
+    ? resolveCategoryPageId(pagesData.pages, pageId)
+    : fallbackPageId;
 }
 
 function getPageIdFromUrl() {
@@ -679,19 +780,18 @@ function isProjectListPage(page) {
 }
 
 function getAllProjectItems() {
-  const projectsPage = pagesData.pages.find((page) => page.id === 'projects');
+  const allItems = pagesData.pages
+    .filter(isProjectListPage)
+    .flatMap((page) => getNewestProjectItems(page));
+  const uniqueItems = [...new Map(allItems.map((item) => [item.target, item])).values()];
 
-  return getNewestProjectItems(projectsPage).map((item) => {
+  return uniqueItems.map((item) => {
     const detailPage = pagesData.pages.find((page) => page.id === item.target);
     return {
       ...item,
       tags: detailPage?.projectDetails?.tags ?? item.tags ?? [],
     };
   });
-}
-
-function getNewestProjectItems(page) {
-  return [...(page?.projectItems ?? [])].reverse();
 }
 
 function normalizeTag(tag) {
@@ -707,7 +807,7 @@ function getTagPageId(tag) {
 }
 
 function animateCameraToDefault(duration) {
-  return animateCameraToLayout(getCameraLayout(), duration);
+  return animateCameraToLayout(getCameraLayout(camera.zoom), duration);
 }
 
 function animateCameraToTextBlock() {
@@ -806,6 +906,7 @@ function hasCameraMovedToLayout(startViewSize, endViewSize) {
 }
 
 function getCameraLerpDuration() {
+  if (currentGroup.userData.categoryId) return 800;
   return transitionManager.overlapDelay + transitionManager.getGroupAnimationDuration(currentGroup);
 }
 
@@ -830,10 +931,12 @@ function syncControlsToCamera() {
 }
 
 function clampControlsTarget() {
+  const navigation = getProjectNavigation(pagesData.pages, stateManager.currentPageId);
+  const origin = navigation ? getProjectTilePosition(navigation.index) : defaultCameraConfig.desktop.target;
   controls.target.x = THREE.MathUtils.clamp(
     controls.target.x,
-    cameraControlsConfig.targetMin.x,
-    cameraControlsConfig.targetMax.x,
+    origin.x + cameraControlsConfig.targetMin.x,
+    origin.x + cameraControlsConfig.targetMax.x,
   );
   controls.target.y = THREE.MathUtils.clamp(
     controls.target.y,
@@ -842,8 +945,8 @@ function clampControlsTarget() {
   );
   controls.target.z = THREE.MathUtils.clamp(
     controls.target.z,
-    cameraControlsConfig.targetMin.z,
-    cameraControlsConfig.targetMax.z,
+    origin.z + cameraControlsConfig.targetMin.z,
+    origin.z + cameraControlsConfig.targetMax.z,
   );
 }
 

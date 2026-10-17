@@ -46,9 +46,12 @@ export function generateLayout(page, options = {}) {
   const fillerRings = options.fillerRings ?? 2;
 
   if (page.template === 'projectDetail') {
-    const projectBlocks = generateProjectDetailLayout(page, grid, palette);
-    return [...projectBlocks, ...createOuterFillerBlocks(grid, palette, fillerRings)].map((block) =>
-      addWorldRect(block, grid),
+    const detailGrid = page.projectNavigation
+      ? { ...grid, rows: grid.rows + 1, worldDepth: grid.worldDepth + grid.worldDepth / grid.rows }
+      : grid;
+    const projectBlocks = generateProjectDetailLayout(page, detailGrid, palette);
+    return [...projectBlocks, ...createOuterFillerBlocks(detailGrid, palette, fillerRings)].map((block) =>
+      addWorldRect(block, detailGrid),
     );
   }
 
@@ -95,7 +98,7 @@ function generateProjectDetailLayout(page, grid, palette) {
     gridW: 1,
     gridHUnit: 2,
     content: { label: 'BACK', fontWeight: 700 },
-    action: { type: 'back' },
+    action: { type: 'back', target: page.projectNavigation?.backTarget },
   });
 
   addBlock({
@@ -135,7 +138,7 @@ function generateProjectDetailLayout(page, grid, palette) {
     gridHUnit: 8,
     content: {
       src: details.image ?? '/images/project-placeholder.jpg',
-      alt: `${details.title ?? page.id} hero image`,
+      alt: details.imageAlt ?? `${details.title ?? page.id} hero image`,
     },
     color: palette[0],
   });
@@ -195,6 +198,45 @@ function generateProjectDetailLayout(page, grid, palette) {
       gridHUnit: 2,
       content: { label: details.link.label ?? 'LINK', fontWeight: 700 },
       action: { type: 'link', url: details.link.url },
+    });
+  }
+
+  if (page.projectNavigation) {
+    const { index, count, previousPageId, nextPageId } = page.projectNavigation;
+    const navigationHeight = getContentBlockHeight();
+    const navigationRow = {
+      gridYUnit: (grid.rows - 1) * unitsPerRow,
+      gridHUnit: unitsPerRow,
+      height: navigationHeight,
+    };
+
+    addBlock({
+      ...navigationRow,
+      id: `${page.id}-previous-project`,
+      type: count > 1 ? 'interaction' : 'content',
+      gridX: 1,
+      gridW: 1,
+      content: { label: 'PREV', iconSrc: '/icons/arrow-left.svg', fontWeight: 700 },
+      action: count > 1 ? { type: 'project', target: previousPageId } : null,
+    });
+    addBlock({
+      ...navigationRow,
+      id: `${page.id}-project-counter`,
+      type: 'content',
+      subtype: 'counter',
+      gridX: 2,
+      gridW: 2,
+      content: { text: `${index + 1} OF ${count}`, fontWeight: 700, fontSize: 0.28 },
+      color: palette[0],
+    });
+    addBlock({
+      ...navigationRow,
+      id: `${page.id}-next-project`,
+      type: count > 1 ? 'interaction' : 'content',
+      gridX: 4,
+      gridW: 1,
+      content: { label: 'NEXT', iconSrc: '/icons/arrow-right.svg', fontWeight: 700 },
+      action: count > 1 ? { type: 'project', target: nextPageId } : null,
     });
   }
 

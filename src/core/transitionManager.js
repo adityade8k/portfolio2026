@@ -78,6 +78,9 @@ export class TransitionManager {
   }
 
   animateGroup(group, direction) {
+    if (group.userData.transitionGroups) {
+      return Promise.all(group.userData.transitionGroups.map((tile) => this.animateGroup(tile, direction)));
+    }
     const { centralMeshes, ringMeshes } = splitBlockMeshes(group);
 
     const centralAnimation = this.animateMeshes(
@@ -99,18 +102,30 @@ export class TransitionManager {
     return Promise.all([centralAnimation, ringAnimation]);
   }
 
-  animateObjects(objects, direction) {
+  async transitionNavigation({ oldControls, newControls, moveCamera }) {
+    await this.animateObjects(oldControls, 'exit', { duration: 200, stagger: 20 });
+    oldControls.flatMap(getBlockMeshes).forEach((mesh) => { mesh.userData.skipPageTransition = true; });
+    newControls.forEach((block) => this.setGroupProgress(block, 0));
+    await moveCamera();
+    newControls.flatMap(getBlockMeshes).forEach((mesh) => { mesh.userData.skipPageTransition = false; });
+    await this.animateObjects(newControls, 'enter', { duration: 260, stagger: 20 });
+  }
+
+  animateObjects(objects, direction, { duration = this.duration, stagger = this.stagger } = {}) {
     const meshes = objects
       .flatMap((object) => getBlockMeshes(object))
       .sort((a, b) => a.getWorldPosition(tempA).x - b.getWorldPosition(tempB).x);
 
     return this.animateMeshes(meshes, direction, {
-      duration: this.duration,
-      delays: meshes.map((_, index) => index * this.stagger),
+      duration,
+      delays: meshes.map((_, index) => index * stagger),
     });
   }
 
   getGroupAnimationDuration(group) {
+    if (group.userData.transitionGroups) {
+      return Math.max(0, ...group.userData.transitionGroups.map((tile) => this.getGroupAnimationDuration(tile)));
+    }
     const { centralMeshes, ringMeshes } = splitBlockMeshes(group);
     return Math.max(
       this.getSteppedAnimationDuration(centralMeshes, this.duration, this.stagger),
@@ -168,7 +183,9 @@ export class TransitionManager {
   }
 
   setGroupProgress(group, progress) {
-    getBlockMeshes(group).forEach((mesh) => this.setMeshProgress(mesh, progress));
+    getBlockMeshes(group).forEach((mesh) =>
+      this.setMeshProgress(mesh, mesh.userData.skipPageTransition ? 0 : progress),
+    );
   }
 
   setMeshProgress(mesh, progress) {
@@ -201,6 +218,7 @@ function splitBlockMeshes(group) {
   const ringMeshes = [];
 
   getBlockMeshes(group).forEach((mesh) => {
+    if (mesh.userData.skipPageTransition) return;
     if (mesh.userData.blockData?.subtype === 'outerDecorative') {
       ringMeshes.push(mesh);
     } else {
