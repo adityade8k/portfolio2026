@@ -9,6 +9,20 @@
         "#f4c430",
         "#111111"
       ],
+      "uniqueColorGroups": [
+        {
+          "blockIds": [
+            "home-projects",
+            "home-experiments",
+            "home-teaching"
+          ],
+          "colors": [
+            "#e23d28",
+            "#1f5fbf",
+            "#f4c430"
+          ]
+        }
+      ],
       "blocks": [
         {
           "id": "home-title",
@@ -16,9 +30,16 @@
           "subtype": "header",
           "placement": "hero",
           "size": "large",
+          "gridRect": [
+            2,
+            1,
+            3,
+            3
+          ],
           "content": {
             "text": "ADITYA DE",
-            "fontWeight": 700
+            "fontWeight": 700,
+            "fontSize": 0.62
           }
         },
         {
@@ -27,9 +48,19 @@
           "subtype": "text",
           "placement": "center",
           "size": "wide",
+          "gridRect": [
+            1,
+            4,
+            5,
+            3
+          ],
           "content": {
             "text": "Creative Technologist and Design Educator working with extended reality interactions, specializing in browser-powered 3D experiences.",
-            "fontWeight": 300
+            "fontWeight": 400,
+            "fontSize": 0.4,
+            "lineHeight": 1.12,
+            "textAlign": "left",
+            "padding": 0.4
           }
         },
         {
@@ -37,9 +68,16 @@
           "type": "interaction",
           "placement": "bottomRightLowerLeft",
           "size": "medium",
+          "gridRect": [
+            2,
+            8,
+            2,
+            2
+          ],
           "content": {
             "label": "PROJECTS",
-            "fontWeight": 400
+            "fontWeight": 400,
+            "fontSize": 0.42
           },
           "action": {
             "type": "state",
@@ -49,11 +87,18 @@
         {
           "id": "home-about",
           "type": "interaction",
-          "placement": "topRight",
+          "placement": "topLeftStack2",
           "size": "medium",
+          "gridRect": [
+            0,
+            0,
+            2,
+            2
+          ],
           "content": {
             "label": "ABOUT",
-            "fontWeight": 400
+            "fontWeight": 400,
+            "fontSize": 0.42
           },
           "action": {
             "type": "state",
@@ -65,9 +110,16 @@
           "type": "interaction",
           "placement": "bottomRightTop",
           "size": "shortWide",
+          "gridRect": [
+            0,
+            7,
+            4,
+            1
+          ],
           "content": {
             "label": "EXPERIMENTS",
-            "fontWeight": 400
+            "fontWeight": 400,
+            "fontSize": 0.42
           },
           "action": {
             "type": "state",
@@ -79,13 +131,46 @@
           "type": "interaction",
           "placement": "bottomRightLowerRight",
           "size": "medium",
+          "gridRect": [
+            4,
+            8,
+            2,
+            2
+          ],
           "content": {
-            "label": "TEACHING",
-            "fontWeight": 400
+            "label": "TEACHING\n& RESEARCH",
+            "fontWeight": 400,
+            "fontSize": 0.34,
+            "lineHeight": 1.12
           },
           "action": {
             "type": "state",
             "target": "teaching"
+          }
+        },
+        {
+          "id": "home-explore-tags",
+          "type": "interaction",
+          "subtype": "text",
+          "placement": "bottomLeft",
+          "size": "shortWide",
+          "gridRect": [
+            4,
+            7,
+            2,
+            1
+          ],
+          "color": "#f7f3e8",
+          "content": {
+            "label": "EXPLORE\nBY TAGS",
+            "fontWeight": 400,
+            "fontSize": 0.3,
+            "lineHeight": 1.12,
+            "padding": 0.12
+          },
+          "action": {
+            "type": "state",
+            "target": "tags"
           }
         }
       ]
@@ -137,7 +222,7 @@
         },
         {
           "id": "bitsDesignSchoolShowcase2025",
-          "title": "BITS Design School Schowcase 2025",
+          "title": "BITS Design School Showcase 2025",
           "thumbnail": "/images/bits-design-school-showcase-2025.svg",
           "target": "bitsDesignSchoolShowcase2025"
         },
@@ -158,6 +243,18 @@
           "title": "Nature of Code/ Branch Notebook",
           "thumbnail": "/images/nature-of-code-branch-notebook.svg",
           "target": "natureOfCodeBranchNotebook"
+        },
+        {
+          "id": "astralProjection",
+          "title": "Astral Projection",
+          "thumbnail": "/images/project-placeholder.svg",
+          "target": "astralProjection"
+        },
+        {
+          "id": "hongOrchestra",
+          "title": "Honk Orchestra",
+          "thumbnail": "/images/project-placeholder.svg",
+          "target": "hongOrchestra"
         }
       ],
       "blocks": [
@@ -224,33 +321,41 @@
         "title": "Live Ball Data Visualizer for Cricket",
         "image": "/images/archive/cricket-ball-trajectory.webp",
         "imageAlt": "Ball trajectory and broadcast overlay in the cricket visualizer.",
+        "presentation": {
+          "layout": "overview",
+          "imageSize": [
+            1320,
+            740
+          ]
+        },
         "tags": [
           "REACT",
-          "REACT THREE FIBER",
+          "THREE.JS",
           "DATA VIZ",
-          "BROADCAST"
+          "ANIMATION"
         ],
         "textBlocks": [
-          "At Cloudworx Studio, I worked on a live cricket ball trajectory visualizer for StanceBeam, built for match analysis and broadcast.",
-          "I developed the React interface, animation controls, and broadcast overlays, working with the 3D team to connect live ball data to the scene."
+          "A live 3D cricket visualizer that turns ball-tracking data into animations for match analysis and broadcast."
         ],
         "modal": {
           "title": "Live Ball Data Visualizer for Cricket",
-          "context": "Cloudworx Studio · StanceBeam · 2024 · Frontend development",
+          "context": "Cloudworx Studio · 2024 · Frontend development · In collaboration with StanceBeam",
           "sections": [
             {
               "type": "text",
-              "content": "At Cloudworx Studio, I worked on a live cricket ball trajectory visualizer for StanceBeam, built for match analysis and broadcast."
+              "content": "At Cloudworx Studio, a digital twins company, we collaborated with StanceBeam, a company specializing in cricket data collection and analysis, to build a live cricket ball trajectory visualizer. I worked on the application’s frontend for match analysis and broadcast."
             },
             {
               "type": "image",
               "src": "/images/archive/cricket-ball-trajectory.webp",
-              "caption": "Ball trajectory and broadcast overlay in the cricket visualizer.",
-              "alt": "Ball trajectory and broadcast overlay in the cricket visualizer."
+              "caption": "Single-ball trajectory and ticker showing the bowler, over, delivery number, and turn angle.",
+              "alt": "A single ball trajectory with the bowler name, first over, and a 4.3-degree turn angle in the ticker.",
+              "width": 1320,
+              "height": 740
             },
             {
               "type": "text",
-              "content": "StanceBeam developed an ML-based system to track a cricket ball during live matches. Our application received trajectory data through an API and turned it into animations. The visualization needed to be compelling for live telecasts and accurate enough to support analysis of Leg-Before-Wicket (LBW) decisions."
+              "content": "StanceBeam developed an ML-based system to track a cricket ball during live matches. Our application received trajectory data through an API and turned it into animations. The visualization needed to be compelling for live telecasts and highly accurate, with Leg-Before-Wicket (LBW) decision analysis as its primary use case."
             },
             {
               "type": "heading",
@@ -258,7 +363,7 @@
             },
             {
               "type": "text",
-              "content": "We built the application with React and React Three Fiber. My primary role was developing the 2D interface with Tailwind CSS. Operators could choose the animation type, select an over and ball, and configure camera transitions and displayed data. I also designed and animated the ticker overlay. Once the scene was set up, pressing the spacebar started the animation."
+              "content": "We built the application with React and React Three Fiber. My primary role was developing the 2D interface with Tailwind CSS. Operators could select an innings, choose an animation package, and select an over and individual balls or all balls in that over. They could leave the camera in place or transition to a stump or impact view, and display ball speed or angle before pitching, after pitching, or as an average. Once the scene was set up, pressing the spacebar started the animation."
             },
             {
               "type": "gallery",
@@ -266,20 +371,24 @@
                 {
                   "type": "image",
                   "src": "/images/archive/cricket-animation-menu.webp",
-                  "caption": "The menu for selecting an animation package.",
-                  "alt": "The menu for selecting an animation package."
+                  "caption": "Graphics-package selection: Over Review, Decision Review, Swing Analysis, Pitch Map, Runs by Over, and Camera Adjust, with an innings selector.",
+                  "alt": "The menu for selecting an animation package.",
+                  "width": 1320,
+                  "height": 740
                 },
                 {
                   "type": "image",
                   "src": "/images/archive/cricket-data-controls.webp",
-                  "caption": "Controls for selecting ball data and configuring the scene.",
-                  "alt": "Controls for selecting ball data and configuring the scene."
+                  "caption": "Over and ball selection, camera-transition options, and speed or angle data before and after pitching or as an average.",
+                  "alt": "Controls for selecting ball data and configuring the scene.",
+                  "width": 1320,
+                  "height": 740
                 }
               ]
             },
             {
               "type": "text",
-              "content": "I worked with the modeling team to align the virtual stadium with the scale of the incoming data. I also collaborated with the Three.js team on callbacks that connected interface actions to the animation system."
+              "content": "I worked with the modeling team to align the virtual stadium with the scale of the incoming data. I also collaborated with the Three.js team on callbacks that connected interface actions to the animation system. The camera-adjustment view also let operators align the virtual pitch with reference broadcast footage."
             },
             {
               "type": "gallery",
@@ -288,25 +397,61 @@
                   "type": "image",
                   "src": "/images/archive/cricket-lbw-analysis.webp",
                   "caption": "Ball tracking for an LBW review.",
-                  "alt": "Ball tracking for an LBW review."
+                  "alt": "Ball tracking for an LBW review.",
+                  "width": 1320,
+                  "height": 740
+                },
+                {
+                  "type": "image",
+                  "src": "/images/archive/cricket-lbw-front-review.webp",
+                  "caption": "Front-view LBW review with pitching, impact, wicket contact, and review-decision overlays.",
+                  "alt": "Front view of a ball trajectory with pitching outside off, impact marked umpire’s call, and a not-out review decision.",
+                  "width": 1320,
+                  "height": 740
                 },
                 {
                   "type": "image",
                   "src": "/images/archive/cricket-pitch-map.webp",
                   "caption": "Pitch map showing multiple ball trajectories.",
-                  "alt": "Pitch map showing multiple ball trajectories."
+                  "alt": "Pitch map showing multiple ball trajectories.",
+                  "width": 1320,
+                  "height": 740
                 }
               ]
             },
             {
               "type": "heading",
-              "content": "Application walkthrough"
+              "content": "Review graphics and ticker overlays"
+            },
+            {
+              "type": "text",
+              "content": "The graphics packages included unified over reviews, individual-ball swing analysis, pitch maps, runs by over, and LBW decision reviews. The decision-review overlay displayed pitching position, impact, and projected wicket contact alongside the original decision, final decision, and bowling-team review result."
+            },
+            {
+              "type": "text",
+              "content": "I also designed the 2D ticker overlay and animated it with Tailwind. It identified the bowler and over, with layouts for per-ball speeds across an over or the turn angle of an individual delivery."
+            },
+            {
+              "type": "image",
+              "src": "/images/archive/cricket-over-review-ticker.webp",
+              "caption": "Over-review ticker showing the bowler, over, and speed of each delivery.",
+              "alt": "Multiple ball trajectories with an orange ticker listing six ball speeds.",
+              "width": 1320,
+              "height": 740
+            },
+            {
+              "type": "heading",
+              "content": "Camera perspective alignment tool"
+            },
+            {
+              "type": "text",
+              "content": "We made a camera perspective alignment tool that superimposed the virtual pitch over reference broadcast footage. Operators could adjust the field of view, camera position and target, and the reference image’s opacity. Camera configurations could be downloaded and uploaded for reuse."
             },
             {
               "type": "video",
               "src": "/videos/archive/cricket-application-demo.mp4",
-              "poster": "/images/archive/cricket-animation-menu.webp",
-              "caption": "Archived screen recording of the cricket visualizer and its operator controls."
+              "poster": "/images/archive/cricket-camera-alignment.webp",
+              "caption": "Demonstration of the camera perspective alignment tool, matching the virtual pitch to a reference broadcast frame."
             },
             {
               "type": "heading",
@@ -314,14 +459,25 @@
             },
             {
               "type": "text",
-              "content": "The application included unified over reviews, pitch maps, and swing analysis for individual balls. It was used in the 2024 Madhya Pradesh Premier League and broadcast live on Jio Cinema."
+              "content": "The application was used in the 2024 Madhya Pradesh Premier League and broadcast live on Jio Cinema."
             },
             {
-              "type": "link",
-              "label": "Watch the archived broadcast video",
-              "url": "https://drive.google.com/file/d/1laqF3NLFA8o66HoPqniyRJjQLEwGETaL/view?usp=sharing"
+              "type": "video",
+              "src": "/videos/archive/cricket-live-broadcast.mp4",
+              "poster": "/images/archive/cricket-live-broadcast.webp",
+              "caption": "Live-broadcast excerpt from the 2024 Madhya Pradesh Premier League, showing an LBW review in the match coverage."
             }
-          ]
+          ],
+          "metadata": {
+            "years": [
+              "2024"
+            ],
+            "organizations": [
+              "Cloudworx Studio"
+            ],
+            "role": "Frontend development"
+          },
+          "introHeading": "From ball tracking to live broadcast."
         },
         "archiveSource": {
           "document": "AdityaDePortfolio (Portfolio 2025)",
@@ -330,9 +486,14 @@
             9
           ]
         },
-        "link": {
-          "label": "VIDEO",
-          "url": "https://drive.google.com/file/d/1laqF3NLFA8o66HoPqniyRJjQLEwGETaL/view?usp=sharing"
+        "metadata": {
+          "years": [
+            "2024"
+          ],
+          "organizations": [
+            "Cloudworx Studio"
+          ],
+          "role": "Frontend development"
         }
       }
     },
@@ -344,14 +505,12 @@
         "image": "/images/archive/walkthrough-living-room.webp",
         "imageAlt": "A browser-based architectural walkthrough with baked lighting.",
         "tags": [
-          "WEB 3D",
-          "VR",
-          "REAL ESTATE",
-          "OPTIMIZATION"
+          "THREE.JS",
+          "XR / VR",
+          "RESEARCH"
         ],
         "textBlocks": [
-          "This project began in 2020 with a question: could we experience the SketchUp models made by interior design students in VR?",
-          "I explored browser-based architectural walkthroughs across desktop, VR, and mobile, refining model optimization and baked lighting with 3D artist Piyush Jain."
+          "Browser-based architectural walkthroughs for desktop, mobile, and VR, with optimized models and baked lighting."
         ],
         "modal": {
           "title": "3D Walkthrough Application for Real Estate",
@@ -365,7 +524,9 @@
               "type": "image",
               "src": "/images/archive/walkthrough-living-room.webp",
               "caption": "A browser-based architectural walkthrough with baked lighting.",
-              "alt": "A browser-based architectural walkthrough with baked lighting."
+              "alt": "A browser-based architectural walkthrough with baked lighting.",
+              "width": 1600,
+              "height": 889
             },
             {
               "type": "text",
@@ -386,13 +547,17 @@
                   "type": "image",
                   "src": "/images/archive/walkthrough-dining-room.webp",
                   "caption": "Dining and living spaces in the walkthrough.",
-                  "alt": "Dining and living spaces in the walkthrough."
+                  "alt": "Dining and living spaces in the walkthrough.",
+                  "width": 1600,
+                  "height": 889
                 },
                 {
                   "type": "image",
                   "src": "/images/archive/walkthrough-bedroom.webp",
                   "caption": "A bedroom scene with light and shadows baked into the textures.",
-                  "alt": "A bedroom scene with light and shadows baked into the textures."
+                  "alt": "A bedroom scene with light and shadows baked into the textures.",
+                  "width": 1600,
+                  "height": 889
                 }
               ]
             },
@@ -412,14 +577,25 @@
               "type": "image",
               "src": "/images/archive/walkthrough-lounge.webp",
               "caption": "Another interior from the walkthrough experiments.",
-              "alt": "Another interior from the walkthrough experiments."
+              "alt": "Another interior from the walkthrough experiments.",
+              "width": 1600,
+              "height": 889
             },
             {
               "type": "link",
               "label": "Explore the archived walkthrough collection",
               "url": "https://commiep.github.io/PCLinks/"
             }
-          ]
+          ],
+          "metadata": {
+            "years": [
+              "2020"
+            ],
+            "organizations": [],
+            "role": "Development with Piyush Jain",
+            "status": "2020–ongoing"
+          },
+          "introHeading": "Exploring architecture through the browser."
         },
         "archiveSource": {
           "document": "AdityaDePortfolio (Portfolio 2025)",
@@ -431,7 +607,23 @@
         "link": {
           "label": "VISIT",
           "url": "https://commiep.github.io/PCLinks/"
-        }
+        },
+        "metadata": {
+          "years": [
+            "2020"
+          ],
+          "organizations": [],
+          "role": "Development with Piyush Jain",
+          "status": "2020–ongoing"
+        },
+        "presentation": {
+          "layout": "overview",
+          "imageSize": [
+            1600,
+            889
+          ]
+        },
+        "tileTitle": "Architectural Walkthroughs"
       }
     },
     {
@@ -443,13 +635,11 @@
         "imageAlt": "The RadBoards virtual store, with product displays and a baked lighting environment.",
         "tags": [
           "THREE.JS",
-          "VIRTUAL STORE",
-          "ECOMMERCE",
-          "JQUERY"
+          "XR / VR",
+          "SHOWCASE"
         ],
         "textBlocks": [
-          "At Conscious Circle, I built a virtual store for RadBoards, a Bangalore-based hoverboard and electric kick scooter brand.",
-          "Visitors can navigate the store, explore products, watch videos, browse a gallery, and add products to a cart."
+          "A Three.js virtual store where visitors explore RadBoards products, browse media, and add items to a cart."
         ],
         "modal": {
           "title": "Radstore — RadBoards Virtual Store Experience",
@@ -463,11 +653,13 @@
               "type": "image",
               "src": "/images/archive/radstore-interior.webp",
               "caption": "The RadBoards virtual store, with product displays and a baked lighting environment.",
-              "alt": "The RadBoards virtual store, with product displays and a baked lighting environment."
+              "alt": "The RadBoards virtual store, with product displays and a baked lighting environment.",
+              "width": 1130,
+              "height": 515
             },
             {
               "type": "text",
-              "content": "I built the frontend with Three.js and managed the 2D product popups with jQuery. Piyush Jain created the 3D models, textures, lighting, and baked environment. We integrated a video display and an image gallery for the brand’s social media posts."
+              "content": "I built the frontend with Three.js and managed the 2D product popups with jQuery. Visitors could move freely through the store, inspect products, and add them to a cart. Piyush Jain created the 3D models, textures, lighting, and baked environment. We integrated a video display and an image gallery for the brand’s social media posts."
             },
             {
               "type": "gallery",
@@ -476,13 +668,17 @@
                   "type": "image",
                   "src": "/images/archive/radstore-product-popup.webp",
                   "caption": "A product popup within the virtual store.",
-                  "alt": "A product popup within the virtual store."
+                  "alt": "A product popup within the virtual store.",
+                  "width": 551,
+                  "height": 361
                 },
                 {
                   "type": "image",
                   "src": "/images/archive/radstore-video-display.webp",
                   "caption": "An in-store video display.",
-                  "alt": "An in-store video display."
+                  "alt": "An in-store video display.",
+                  "width": 558,
+                  "height": 334
                 }
               ]
             },
@@ -494,14 +690,27 @@
               "type": "image",
               "src": "/images/archive/radstore-showroom.webp",
               "caption": "Product displays in another area of the showroom.",
-              "alt": "Product displays in another area of the showroom."
+              "alt": "Product displays in another area of the showroom.",
+              "width": 966,
+              "height": 508
             },
             {
               "type": "link",
               "label": "Explore Radstore",
               "url": "https://commiep.github.io/RadStore/"
             }
-          ]
+          ],
+          "metadata": {
+            "years": [
+              "2022"
+            ],
+            "organizations": [
+              "Conscious Circle",
+              "RadBoards"
+            ],
+            "role": "Frontend development"
+          },
+          "introHeading": "A virtual showroom for RadBoards."
         },
         "archiveSource": {
           "document": "AdityaDePortfolio (Portfolio 2025)",
@@ -513,7 +722,25 @@
         "link": {
           "label": "VISIT",
           "url": "https://commiep.github.io/RadStore/"
-        }
+        },
+        "metadata": {
+          "years": [
+            "2022"
+          ],
+          "organizations": [
+            "Conscious Circle",
+            "RadBoards"
+          ],
+          "role": "Frontend development"
+        },
+        "presentation": {
+          "layout": "overview",
+          "imageSize": [
+            1130,
+            515
+          ]
+        },
+        "tileTitle": "Radstore — Virtual Store"
       }
     },
     {
@@ -526,12 +753,11 @@
         "tags": [
           "THREE.JS",
           "SIMULATION",
-          "TRAINING",
-          "WEB APP"
+          "SYSTEMS",
+          "PEDAGOGY"
         ],
         "textBlocks": [
-          "During my sixth-semester internship at Hoansi Studios, I developed a browser-based warehouse training prototype for the logistics industry.",
-          "The simulation combines 3D navigation, box handling, scanner input, and real-time instructions with an editor for configuring training exercises."
+          "A browser-based warehouse training simulation with scanning, box handling, and customizable exercises."
         ],
         "modal": {
           "title": "Training Simulation Application for the Logistics Industry",
@@ -545,7 +771,9 @@
               "type": "image",
               "src": "/images/archive/warehouse-training.webp",
               "caption": "The warehouse training simulation with box handling and a scanner interface.",
-              "alt": "The warehouse training simulation with box handling and a scanner interface."
+              "alt": "The warehouse training simulation with box handling and a scanner interface.",
+              "width": 1500,
+              "height": 1000
             },
             {
               "type": "heading",
@@ -553,7 +781,7 @@
             },
             {
               "type": "text",
-              "content": "COVID-19 restrictions limited the number of workers who could be on a warehouse floor. Training new workers on-site could therefore reduce warehouse productivity. The client proposed a virtual training module to reduce the time needed for on-site training. This was the goal of the prototype, rather than a measured outcome."
+              "content": "The client worked in the logistics industry in the United States. During COVID-19 restrictions, limits on warehouse staffing meant training new workers on the floor could reduce productivity. Their goal was a virtual module that could shorten a training period of approximately four weeks or eventually replace the need for on-site training. This was the prototype’s aim, rather than a measured result."
             },
             {
               "type": "text",
@@ -565,7 +793,7 @@
             },
             {
               "type": "text",
-              "content": "I first built the receiving workflow in A-Frame to test movement and scanning interactions. That version distinguished between pallets and individual boxes. I then modeled a warehouse in Autodesk Fusion 360 and made its textures and floor markings in Photoshop and Illustrator."
+              "content": "I first built the receiving workflow in A-Frame to test movement and scanning interactions. That version distinguished between pallets and individual boxes, a distinction omitted from later iterations. I then modeled a warehouse in Autodesk Fusion 360 and made its textures and floor markings in Photoshop and Illustrator."
             },
             {
               "type": "gallery",
@@ -574,13 +802,17 @@
                   "type": "image",
                   "src": "/images/archive/warehouse-first-prototype.webp",
                   "caption": "The early A-Frame proof of concept.",
-                  "alt": "The early A-Frame proof of concept."
+                  "alt": "The early A-Frame proof of concept.",
+                  "width": 1500,
+                  "height": 1000
                 },
                 {
                   "type": "image",
                   "src": "/images/archive/warehouse-model.webp",
                   "caption": "Warehouse modeling and layout.",
-                  "alt": "Warehouse modeling and layout."
+                  "alt": "Warehouse modeling and layout.",
+                  "width": 1500,
+                  "height": 1000
                 }
               ]
             },
@@ -600,14 +832,26 @@
               "type": "image",
               "src": "/images/archive/warehouse-setup-editor.webp",
               "caption": "The setup editor for configuring a training exercise.",
-              "alt": "The setup editor for configuring a training exercise."
+              "alt": "The setup editor for configuring a training exercise.",
+              "width": 1500,
+              "height": 1000
             },
             {
               "type": "link",
               "label": "Open the training prototype",
               "url": "https://quirky-euclid-b05c20.netlify.app/"
             }
-          ]
+          ],
+          "metadata": {
+            "years": [
+              "2021"
+            ],
+            "organizations": [
+              "Hoansi Studios"
+            ],
+            "role": "Sixth-semester internship"
+          },
+          "introHeading": "Learning the warehouse workflow in a browser."
         },
         "archiveSource": {
           "document": "AdityaDePortfolio (Portfolio 2025)",
@@ -619,28 +863,73 @@
         "link": {
           "label": "TRY IT",
           "url": "https://quirky-euclid-b05c20.netlify.app/"
-        }
+        },
+        "metadata": {
+          "years": [
+            "2021"
+          ],
+          "organizations": [
+            "Hoansi Studios"
+          ],
+          "role": "Sixth-semester internship"
+        },
+        "presentation": {
+          "layout": "overview",
+          "imageSize": [
+            1500,
+            1000
+          ]
+        },
+        "tileTitle": "Warehouse Training Simulation"
       }
     },
     {
       "id": "bitsDesignSchoolShowcase2025",
       "template": "projectDetail",
       "projectDetails": {
-        "title": "BITS Design School Schowcase 2025",
+        "title": "BITS Design School Showcase 2025",
         "image": "/images/bits-design-school-showcase-2025.svg",
         "tags": [
           "SHOWCASE",
-          "WEB",
-          "DESIGN SCHOOL",
-          "2025"
+          "ARCHIVE",
+          "STORYTELLING",
+          "THREE.JS"
         ],
         "textBlocks": [
-          "Placeholder project page for BITS Design School Schowcase 2025.",
-          "This space will hold the project context, role, process notes, and final outcomes once the full write-up is ready."
+          "An interactive Three.js archive of the BITS Design School Showcase 2025."
         ],
         "modal": {
-          "title": "BITS Design School Schowcase 2025",
-          "sections": []
+          "title": "BITS Design School Showcase 2025",
+          "sections": [
+            {
+              "type": "image",
+              "src": "/images/bits-design-school-showcase-2025.svg",
+              "alt": "BITS Design School Schowcase 2025"
+            }
+          ],
+          "metadata": {
+            "years": [
+              "2025"
+            ],
+            "organizations": [
+              "BITS Design School"
+            ]
+          }
+        },
+        "metadata": {
+          "years": [
+            "2025"
+          ],
+          "organizations": [
+            "BITS Design School"
+          ]
+        },
+        "presentation": {
+          "layout": "overview",
+          "imageSize": [
+            1200.0,
+            800.0
+          ]
         }
       }
     },
@@ -651,18 +940,45 @@
         "title": "XR Tone Synthesizer and Beat Sequencer",
         "image": "/images/xr-tone-synthesizer-beat-sequencer.svg",
         "tags": [
-          "XR",
+          "XR / VR",
           "SOUND",
-          "SYNTH",
-          "SEQUENCER"
+          "SYSTEMS"
         ],
         "textBlocks": [
-          "Placeholder project page for an XR tone synthesizer and beat sequencer.",
-          "This space will hold interaction details, sound design notes, technical implementation, and documentation once the full write-up is ready."
+          "An XR tone synthesizer and beat sequencer."
         ],
         "modal": {
           "title": "XR Tone Synthesizer and Beat Sequencer",
-          "sections": []
+          "sections": [
+            {
+              "type": "image",
+              "src": "/images/xr-tone-synthesizer-beat-sequencer.svg",
+              "alt": "XR Tone Synthesizer and Beat Sequencer"
+            }
+          ],
+          "metadata": {
+            "years": [
+              "2025"
+            ],
+            "organizations": [
+              "NYU ITP"
+            ]
+          }
+        },
+        "metadata": {
+          "years": [
+            "2025"
+          ],
+          "organizations": [
+            "NYU ITP"
+          ]
+        },
+        "presentation": {
+          "layout": "overview",
+          "imageSize": [
+            1200.0,
+            800.0
+          ]
         }
       }
     },
@@ -673,18 +989,47 @@
         "title": "Powai: Year 1",
         "image": "/images/powai-year-1.svg",
         "tags": [
-          "PLACE",
-          "RESEARCH",
           "ARCHIVE",
-          "STORYTELLING"
+          "STORYTELLING",
+          "THREE.JS"
         ],
         "textBlocks": [
-          "Placeholder project page for Powai: Year 1.",
-          "This space will hold the project narrative, research material, visual documentation, and final reflections once the full write-up is ready."
+          "The first year of Powai, documented through an interactive Three.js archive."
         ],
         "modal": {
           "title": "Powai: Year 1",
-          "sections": []
+          "sections": [
+            {
+              "type": "image",
+              "src": "/images/powai-year-1.svg",
+              "alt": "Powai: Year 1"
+            }
+          ],
+          "metadata": {
+            "years": [
+              "2026"
+            ],
+            "organizations": [
+              "NYU ITP",
+              "BITS Design School"
+            ]
+          }
+        },
+        "metadata": {
+          "years": [
+            "2026"
+          ],
+          "organizations": [
+            "NYU ITP",
+            "BITS Design School"
+          ]
+        },
+        "presentation": {
+          "layout": "overview",
+          "imageSize": [
+            1200.0,
+            800.0
+          ]
         }
       }
     },
@@ -696,17 +1041,45 @@
         "image": "/images/nature-of-code-branch-notebook.svg",
         "tags": [
           "GENERATIVE",
-          "NOTEBOOK",
           "P5.JS",
-          "SYSTEMS"
+          "ARCHIVE",
+          "CREATIVE CODING"
         ],
         "textBlocks": [
-          "Placeholder project page for Nature of Code/ Branch Notebook.",
-          "This space will hold experiments, sketches, code studies, and process notes once the full write-up is ready."
+          "A p5.js notebook of generative sketches and studies from Nature of Code."
         ],
         "modal": {
           "title": "Nature of Code/ Branch Notebook",
-          "sections": []
+          "sections": [
+            {
+              "type": "image",
+              "src": "/images/nature-of-code-branch-notebook.svg",
+              "alt": "Nature of Code/ Branch Notebook"
+            }
+          ],
+          "metadata": {
+            "years": [
+              "2026"
+            ],
+            "organizations": [
+              "NYU ITP"
+            ]
+          }
+        },
+        "metadata": {
+          "years": [
+            "2026"
+          ],
+          "organizations": [
+            "NYU ITP"
+          ]
+        },
+        "presentation": {
+          "layout": "overview",
+          "imageSize": [
+            1200.0,
+            800.0
+          ]
         }
       }
     },
@@ -717,7 +1090,6 @@
         "title": "COMMUNION",
         "image": "/images/communion.jpg",
         "tags": [
-          "WEB 3D",
           "SOUND",
           "PARTICIPATION",
           "RITUAL"
@@ -814,101 +1186,56 @@
       "id": "astralProjection",
       "template": "projectDetail",
       "projectDetails": {
-        "title": "ASTRAL PROJECTION",
-        "image": "/images/astral-projection.jpg",
+        "title": "Astral Projection",
+        "image": "/images/project-placeholder.svg",
+        "imageAlt": "Placeholder for Astral Projection; project imagery to be added.",
+        "placeholder": true,
         "tags": [
-          "GENERATIVE",
-          "SOUND",
-          "INTERACTION",
-          "ATMOSPHERE"
+          "XR / VR"
         ],
         "textBlocks": [
-          "An interactive composition for drifting between layered visual systems and generative sound states.",
-          "Astral Projection treats navigation, atmosphere, and interaction as a single compositional system."
+          "An XR project at NYU ITP. Project documentation is coming soon."
         ],
+        "metadata": {
+          "years": [
+            "2026"
+          ],
+          "organizations": [
+            "NYU ITP"
+          ]
+        },
+        "presentation": {
+          "layout": "overview",
+          "imageSize": [
+            1200,
+            800
+          ]
+        },
         "modal": {
           "title": "Astral Projection",
+          "metadata": {
+            "years": [
+              "2026"
+            ],
+            "organizations": [
+              "NYU ITP"
+            ]
+          },
+          "introHeading": "Documentation coming soon.",
           "sections": [
             {
               "type": "text",
-              "content": "Astral Projection treats navigation, atmosphere, and interaction as a single compositional system."
+              "content": "An XR project at NYU ITP. Project documentation is coming soon."
             },
             {
               "type": "image",
-              "src": "/images/astral-projection.jpg",
-              "caption": "Placeholder project image."
+              "src": "/images/project-placeholder.svg",
+              "alt": "Placeholder for Astral Projection.",
+              "caption": "Project imagery to be added."
             }
           ]
         }
-      },
-      "blocks": [
-        {
-          "id": "astral-title",
-          "type": "content",
-          "subtype": "header",
-          "placement": "top",
-          "size": "wide",
-          "content": {
-            "text": "ASTRAL PROJECTION"
-          }
-        },
-        {
-          "id": "astral-text",
-          "type": "content",
-          "subtype": "text",
-          "placement": "center",
-          "size": "wide",
-          "content": {
-            "text": "An interactive composition for drifting between layered visual systems and generative sound states."
-          }
-        },
-        {
-          "id": "astral-image",
-          "type": "content",
-          "subtype": "image",
-          "placement": "right",
-          "size": "large",
-          "content": {
-            "src": "/images/astral-projection.jpg",
-            "alt": "Astral Projection project placeholder"
-          }
-        },
-        {
-          "id": "astral-more",
-          "type": "moreInfo",
-          "placement": "bottom",
-          "size": "medium",
-          "content": {
-            "label": "MORE INFO"
-          },
-          "modal": {
-            "title": "Astral Projection",
-            "sections": [
-              {
-                "type": "text",
-                "content": "Astral Projection treats navigation, atmosphere, and interaction as a single compositional system."
-              },
-              {
-                "type": "image",
-                "src": "/images/astral-projection.jpg",
-                "caption": "Placeholder project image."
-              }
-            ]
-          }
-        },
-        {
-          "id": "astral-back",
-          "type": "interaction",
-          "placement": "topLeftStack1",
-          "size": "small",
-          "content": {
-            "label": "BACK"
-          },
-          "action": {
-            "type": "back"
-          }
-        }
-      ]
+      }
     },
     {
       "id": "spatialSketches",
@@ -1264,9 +1591,21 @@
         },
         {
           "id": "threejsWorkshopNyuTandonMakerspaceDesignLab",
-          "title": "Three.js Workshop @ NYU Tandon Makerspace Design Lab",
+          "title": "Three.js Workshop @ NYU Makerspace",
           "thumbnail": "/images/threejs-workshop-nyu-tandon-makerspace-design-lab.svg",
           "target": "threejsWorkshopNyuTandonMakerspaceDesignLab"
+        },
+        {
+          "id": "nyuK12XrCohort2026",
+          "title": "NYU K12 XR Cohort 2026",
+          "thumbnail": "/images/project-placeholder.svg",
+          "target": "nyuK12XrCohort2026"
+        },
+        {
+          "id": "algorithmsOfExploitation",
+          "title": "Algorithms of Exploitation",
+          "thumbnail": "/images/project-placeholder.svg",
+          "target": "algorithmsOfExploitation"
         }
       ],
       "blocks": [
@@ -1277,7 +1616,7 @@
           "placement": "top",
           "size": "wide",
           "content": {
-            "text": "TEACHING",
+            "text": "TEACHING & RESEARCH",
             "fontWeight": 700
           }
         },
@@ -1325,7 +1664,8 @@
             "target": "home"
           }
         }
-      ]
+      ],
+      "title": "Teaching & Research"
     },
     {
       "id": "experimentPlaceholder",
@@ -1336,8 +1676,7 @@
         "tags": [
           "EXPERIMENT",
           "FILLER",
-          "STUDY",
-          "WEB"
+          "STUDY"
         ],
         "textBlocks": [
           "Placeholder experiment page for a small browser-native study.",
@@ -1356,9 +1695,8 @@
         "title": "Teaching Placeholder",
         "image": "/images/teaching-placeholder.svg",
         "tags": [
-          "TEACHING",
+          "PEDAGOGY",
           "FILLER",
-          "WORKSHOP",
           "PEDAGOGY"
         ],
         "textBlocks": [
@@ -1380,13 +1718,13 @@
         "imageAlt": "A neuron-inspired environment for exploring theories of habit formation.",
         "tags": [
           "RESEARCH",
-          "VR",
-          "EEG",
-          "TEACHING"
+          "XR / VR",
+          "PEDAGOGY",
+          "THREE.JS",
+          "P5.JS"
         ],
         "textBlocks": [
-          "I worked with Dr. Sanjukta Ghosh’s Habit and Behaviour Lab at Srishti Manipal as a development resource and research assistant from November 2022 to April 2024.",
-          "My work included student support, masterclasses, EEG experiments, a lab website, and web and VR prototypes for research."
+          "Web and VR prototypes, EEG experiments, and teaching support for Dr. Sanjukta Ghosh’s Habit and Behaviour Lab."
         ],
         "modal": {
           "title": "Habit and Behaviour Lab",
@@ -1400,11 +1738,21 @@
               "type": "image",
               "src": "/images/archive/habit-neuron-environment.webp",
               "caption": "A neuron-inspired environment for exploring theories of habit formation.",
-              "alt": "A neuron-inspired environment for exploring theories of habit formation."
+              "alt": "A neuron-inspired environment for exploring theories of habit formation.",
+              "width": 788,
+              "height": 366
             },
             {
               "type": "text",
               "content": "I initially provided technical assistance to students and conducted masterclasses for M.Des Design Led Innovation students on virtual environments and sensor electronics. With Dr. Sanjukta, I explored VR as a medium for meditation and built prototypes to support the lab’s experiments."
+            },
+            {
+              "type": "image",
+              "src": "/images/archive/habit-vr-session.webp",
+              "caption": "Exploring a virtual environment with a VR headset at the Habit and Behaviour Lab.",
+              "alt": "A participant with a VR headset and controller beside monitors displaying interior models.",
+              "width": 1125,
+              "height": 1500
             },
             {
               "type": "heading",
@@ -1418,7 +1766,17 @@
               "type": "image",
               "src": "/images/archive/habit-eeg-session.webp",
               "caption": "An EEG experiment at the Habit and Behaviour Lab.",
-              "alt": "An EEG experiment at the Habit and Behaviour Lab."
+              "alt": "An EEG experiment at the Habit and Behaviour Lab.",
+              "width": 525,
+              "height": 540
+            },
+            {
+              "type": "image",
+              "src": "/images/archive/habit-eeg-material-study.webp",
+              "caption": "An EEG recording session during a hands-on material activity.",
+              "alt": "A participant wearing an EEG band while working with thread and fabric.",
+              "width": 1125,
+              "height": 1500
             },
             {
               "type": "heading",
@@ -1432,7 +1790,9 @@
               "type": "image",
               "src": "/images/archive/habit-lab-website.webp",
               "caption": "The lab website and research archive.",
-              "alt": "The lab website and research archive."
+              "alt": "The lab website and research archive.",
+              "width": 839,
+              "height": 361
             },
             {
               "type": "link",
@@ -1454,13 +1814,17 @@
                   "type": "image",
                   "src": "/images/archive/habit-vr-candle.webp",
                   "caption": "The virtual candle meditation environment.",
-                  "alt": "The virtual candle meditation environment."
+                  "alt": "The virtual candle meditation environment.",
+                  "width": 835,
+                  "height": 364
                 },
                 {
                   "type": "image",
                   "src": "/images/archive/habit-cardboard-viewer.webp",
                   "caption": "Iterations of the low-cost VR viewer.",
-                  "alt": "Iterations of the low-cost VR viewer."
+                  "alt": "Iterations of the low-cost VR viewer.",
+                  "width": 486,
+                  "height": 364
                 }
               ]
             },
@@ -1479,17 +1843,33 @@
                   "type": "image",
                   "src": "/images/archive/habit-runner-prototype.webp",
                   "caption": "The infinite runner used in the experiment.",
-                  "alt": "The infinite runner used in the experiment."
+                  "alt": "The infinite runner used in the experiment.",
+                  "width": 204,
+                  "height": 361
                 },
                 {
                   "type": "image",
                   "src": "/images/archive/habit-session-data.webp",
                   "caption": "The backend used to record game sessions.",
-                  "alt": "The backend used to record game sessions."
+                  "alt": "The backend used to record game sessions.",
+                  "width": 616,
+                  "height": 182
                 }
               ]
             }
-          ]
+          ],
+          "metadata": {
+            "years": [
+              "2022",
+              "2023",
+              "2024"
+            ],
+            "organizations": [
+              "Srishti"
+            ],
+            "role": "Research and technical support"
+          },
+          "introHeading": "Building tools for behavioral research."
         },
         "archiveSource": {
           "document": "AdityaDePortfolio (Portfolio 2025)",
@@ -1501,6 +1881,24 @@
         "link": {
           "label": "VISIT",
           "url": "https://www.habitandbehaviour.com/"
+        },
+        "metadata": {
+          "years": [
+            "2022",
+            "2023",
+            "2024"
+          ],
+          "organizations": [
+            "Srishti"
+          ],
+          "role": "Research and technical support"
+        },
+        "presentation": {
+          "layout": "overview",
+          "imageSize": [
+            788,
+            366
+          ]
         }
       }
     },
@@ -1512,14 +1910,13 @@
         "image": "/images/archive/architecture-student-environment.webp",
         "imageAlt": "Student work: an interior environment developed for the architectural visualization unit.",
         "tags": [
-          "VR",
-          "ARCHITECTURE",
-          "WEB 3D",
-          "WORKSHOP"
+          "XR / VR",
+          "THREE.JS",
+          "PEDAGOGY",
+          "SHOWCASE"
         ],
         "textBlocks": [
-          "In September 2023, I co-facilitated an architectural visualization unit with 3D artist Piyush Jain for third-year Interior Design and Build students at Srishti Manipal.",
-          "Students created web-ready environments through modeling, texturing, lighting, and baking. I built a Three.js sandbox and a website to showcase their projects."
+          "A studio on web-ready architectural environments, with student work presented in a Three.js sandbox."
         ],
         "modal": {
           "title": "Architectural Visualization in Virtual Reality",
@@ -1533,7 +1930,9 @@
               "type": "image",
               "src": "/images/archive/architecture-student-environment.webp",
               "caption": "Student work: an interior environment developed for the architectural visualization unit.",
-              "alt": "Student work: an interior environment developed for the architectural visualization unit."
+              "alt": "Student work: an interior environment developed for the architectural visualization unit.",
+              "width": 558,
+              "height": 360
             },
             {
               "type": "text",
@@ -1546,19 +1945,25 @@
                   "type": "image",
                   "src": "/images/archive/architecture-student-gallery.webp",
                   "caption": "Student work: a virtual gallery environment.",
-                  "alt": "Student work: a virtual gallery environment."
+                  "alt": "Student work: a virtual gallery environment.",
+                  "width": 558,
+                  "height": 361
                 },
                 {
                   "type": "image",
                   "src": "/images/archive/architecture-student-display.webp",
                   "caption": "Student work: a circular display space.",
-                  "alt": "Student work: a circular display space."
+                  "alt": "Student work: a circular display space.",
+                  "width": 558,
+                  "height": 360
                 },
                 {
                   "type": "image",
                   "src": "/images/archive/architecture-student-interior.webp",
                   "caption": "Student work: an interior scene.",
-                  "alt": "Student work: an interior scene."
+                  "alt": "Student work: an interior scene.",
+                  "width": 558,
+                  "height": 364
                 }
               ]
             },
@@ -1571,7 +1976,17 @@
               "label": "Explore the student project archive",
               "url": "https://velvety-pie-f26429.netlify.app/"
             }
-          ]
+          ],
+          "metadata": {
+            "years": [
+              "2023"
+            ],
+            "organizations": [
+              "Srishti"
+            ],
+            "role": "Co-facilitated with Piyush Jain"
+          },
+          "introHeading": "From an architectural model to a shared VR experience."
         },
         "archiveSource": {
           "document": "AdityaDePortfolio (Portfolio 2025)",
@@ -1582,7 +1997,24 @@
         "link": {
           "label": "VISIT",
           "url": "https://velvety-pie-f26429.netlify.app/"
-        }
+        },
+        "metadata": {
+          "years": [
+            "2023"
+          ],
+          "organizations": [
+            "Srishti"
+          ],
+          "role": "Co-facilitated with Piyush Jain"
+        },
+        "presentation": {
+          "layout": "overview",
+          "imageSize": [
+            558,
+            360
+          ]
+        },
+        "tileTitle": "Architectural Visualization in VR"
       }
     },
     {
@@ -1595,12 +2027,11 @@
         "tags": [
           "P5.JS",
           "CREATIVE CODING",
-          "GENERATIVE ART",
-          "TEACHING"
+          "PEDAGOGY",
+          "GENERATIVE"
         ],
         "textBlocks": [
-          "I taught several iterations of Basics of Programming to first-year Creative Coding and User Interface & Interaction Design students at Srishti Manipal.",
-          "Using p5.js, students explored coordinates, loops, randomness, and generative composition. A later workshop at BITS Design School developed these ideas through pixel filters."
+          "Learning programming through p5.js: coordinates, loops, randomness, generative compositions, and pixel filters."
         ],
         "modal": {
           "title": "Basics of Programming",
@@ -1608,17 +2039,19 @@
           "sections": [
             {
               "type": "text",
-              "content": "I taught several iterations of Basics of Programming to first-year Creative Coding and User Interface & Interaction Design students at Srishti Manipal."
+              "content": "I taught several iterations of Basics of Programming to first-year Creative Coding and User Interface & Interaction Design students at Srishti Manipal between November 2022 and April 2024."
             },
             {
               "type": "image",
               "src": "/images/archive/programming-grid-composition.webp",
               "caption": "Student work: a grid-based generative composition from the programming unit.",
-              "alt": "Student work: a grid-based generative composition from the programming unit."
+              "alt": "Student work: a grid-based generative composition from the programming unit.",
+              "width": 1274,
+              "height": 1274
             },
             {
               "type": "text",
-              "content": "Inspired by my own journey into coding with p5.js, I introduced programming through direct visual feedback. Students learned to think algorithmically about composition: instead of only making a final image, they designed rules and systems that generated evolving visuals."
+              "content": "Inspired by my own journey into coding with p5.js, I introduced programming through direct visual feedback. Students explored Cartesian geometry, loops, and randomness, and learned to think algorithmically about composition: instead of only making a final image, they designed rules and systems that generated evolving visuals."
             },
             {
               "type": "heading",
@@ -1635,13 +2068,17 @@
                   "type": "image",
                   "src": "/images/archive/programming-tartan-blue.webp",
                   "caption": "Student work: a tartan pattern created with p5.js.",
-                  "alt": "Student work: a tartan pattern created with p5.js."
+                  "alt": "Student work: a tartan pattern created with p5.js.",
+                  "width": 361,
+                  "height": 361
                 },
                 {
                   "type": "image",
                   "src": "/images/archive/programming-tartan-yellow.webp",
                   "caption": "Student work: another tartan composition.",
-                  "alt": "Student work: another tartan composition."
+                  "alt": "Student work: another tartan composition.",
+                  "width": 273,
+                  "height": 361
                 }
               ]
             },
@@ -1660,15 +2097,51 @@
                   "type": "image",
                   "src": "/images/archive/programming-student-pattern.webp",
                   "caption": "Student work: repeated motifs arranged in a grid.",
-                  "alt": "Student work: repeated motifs arranged in a grid."
+                  "alt": "Student work: repeated motifs arranged in a grid.",
+                  "width": 1070,
+                  "height": 1070
                 },
                 {
                   "type": "image",
                   "src": "/images/archive/programming-student-flowers.webp",
                   "caption": "Student work: a generative composition by Sara.",
-                  "alt": "Student work: a generative composition by Sara."
+                  "alt": "Student work: a generative composition by Sara.",
+                  "width": 500,
+                  "height": 500
+                },
+                {
+                  "type": "image",
+                  "src": "/images/archive/programming-generative-flower-field.webp",
+                  "caption": "Student work: Pranathi’s flower field varies repeated motifs across a grid.",
+                  "alt": "A grid of red, orange and pink flowers varying in size against a cream background.",
+                  "width": 1000,
+                  "height": 1000
+                },
+                {
+                  "type": "image",
+                  "src": "/images/archive/programming-generative-circles.webp",
+                  "caption": "Student work: Swasti’s composition of overlapping lines and circles.",
+                  "alt": "Thin pale-green loops and circles repeated on a blue background.",
+                  "width": 1000,
+                  "height": 1000
                 }
               ]
+            },
+            {
+              "type": "heading",
+              "content": "Composition and perception"
+            },
+            {
+              "type": "text",
+              "content": "Students also explored Gestalt principles through code. The archived exercises include closure and Prägnanz studies, with moving marks, repeated shapes and visual grouping used to investigate how a composition is perceived."
+            },
+            {
+              "type": "image",
+              "src": "/images/archive/programming-gestalt-composition.webp",
+              "caption": "Student work: Rhea’s composition exploring visual grouping and repeated forms.",
+              "alt": "A pink and yellow grid of circles, triangles, dots and flower-like shapes.",
+              "width": 1000,
+              "height": 1000
             },
             {
               "type": "heading",
@@ -1676,7 +2149,7 @@
             },
             {
               "type": "text",
-              "content": "At BITS Design School, Mumbai, I conducted a variation of the unit as a workshop. Over several weeks we explored grids through pixel manipulation, leading to a pixel filter camera app."
+              "content": "In 2024 at BITS Design School, Mumbai, I conducted a variation of the unit as a workshop. Over several weeks we explored grids through pixel manipulation, leading to a pixel filter camera app."
             },
             {
               "type": "gallery",
@@ -1685,23 +2158,96 @@
                   "type": "image",
                   "src": "/images/archive/programming-filter-portrait.webp",
                   "caption": "Workshop output: a portrait processed with the pixel filter app.",
-                  "alt": "Workshop output: a portrait processed with the pixel filter app."
+                  "alt": "Workshop output: a portrait processed with the pixel filter app.",
+                  "width": 832,
+                  "height": 1280
                 },
                 {
                   "type": "image",
                   "src": "/images/archive/programming-filter-street.webp",
                   "caption": "Workshop output: a street photograph transformed through pixel manipulation.",
-                  "alt": "Workshop output: a street photograph transformed through pixel manipulation."
+                  "alt": "Workshop output: a street photograph transformed through pixel manipulation.",
+                  "width": 1065,
+                  "height": 1600
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "content": "A camera as a canvas"
+            },
+            {
+              "type": "text",
+              "content": "The workshop outputs include filtered selfies and photographs. Students translated camera images into colored marks and halftone-like grids, experimenting with limited palettes, contrast and repeated pixel shapes."
+            },
+            {
+              "type": "gallery",
+              "images": [
+                {
+                  "type": "image",
+                  "src": "/images/archive/programming-filter-selfie-halftone.webp",
+                  "caption": "Student work: Nikshitha’s blue and yellow halftone portrait.",
+                  "alt": "A portrait transformed into blue dots against a yellow field.",
+                  "width": 1500,
+                  "height": 919
+                },
+                {
+                  "type": "image",
+                  "src": "/images/archive/programming-filter-selfie-grid.webp",
+                  "caption": "Student work: Rhea’s live camera filter combines color and a divided grid.",
+                  "alt": "A self-portrait split into pink, black and white quadrants with pixel texture.",
+                  "width": 1500,
+                  "height": 926
+                },
+                {
+                  "type": "image",
+                  "src": "/images/archive/programming-filter-selfie-pixels.webp",
+                  "caption": "Student work: Sara’s portrait rebuilt with colored pixel shapes.",
+                  "alt": "A portrait formed from a dense grid of colored square and circular marks.",
+                  "width": 320,
+                  "height": 197
                 }
               ]
             }
-          ]
+          ],
+          "metadata": {
+            "years": [
+              "2022",
+              "2023",
+              "2024"
+            ],
+            "organizations": [
+              "Srishti",
+              "BITS Design School"
+            ],
+            "role": "Teaching and workshop facilitation"
+          },
+          "introHeading": "Learning to code by making images."
         },
         "archiveSource": {
           "document": "AdityaDePortfolio (Portfolio 2025)",
           "pages": [
             5,
             6
+          ]
+        },
+        "metadata": {
+          "years": [
+            "2022",
+            "2023",
+            "2024"
+          ],
+          "organizations": [
+            "Srishti",
+            "BITS Design School"
+          ],
+          "role": "Teaching and workshop facilitation"
+        },
+        "presentation": {
+          "layout": "overview",
+          "imageSize": [
+            1274,
+            1274
           ]
         }
       }
@@ -1710,156 +2256,107 @@
       "id": "threejsWorkshopNyuTandonMakerspaceDesignLab",
       "template": "projectDetail",
       "projectDetails": {
-        "title": "Three.js Workshop @ NYU Tandon Makerspace Design Lab",
+        "title": "Three.js Workshop @ NYU Makerspace",
         "image": "/images/threejs-workshop-nyu-tandon-makerspace-design-lab.svg",
         "tags": [
           "THREE.JS",
-          "WORKSHOP",
-          "WEB 3D",
-          "TEACHING"
+          "PEDAGOGY",
+          "CREATIVE CODING"
         ],
         "textBlocks": [
-          "Placeholder teaching page for a Three.js workshop at NYU Tandon Makerspace Design Lab.",
-          "This space will hold the workshop structure, learning goals, examples, participant outcomes, and documentation once the write-up is ready."
+          "A Three.js creative coding workshop at NYU Makerspace."
         ],
         "modal": {
-          "title": "Three.js Workshop @ NYU Tandon Makerspace Design Lab",
-          "sections": []
+          "title": "Three.js Workshop @ NYU Makerspace",
+          "sections": [
+            {
+              "type": "image",
+              "src": "/images/threejs-workshop-nyu-tandon-makerspace-design-lab.svg",
+              "alt": "Three.js Workshop @ NYU Makerspace"
+            }
+          ],
+          "metadata": {
+            "years": [
+              "2025"
+            ],
+            "organizations": [
+              "NYU Makerspace"
+            ]
+          }
+        },
+        "metadata": {
+          "years": [
+            "2025"
+          ],
+          "organizations": [
+            "NYU Makerspace"
+          ]
+        },
+        "presentation": {
+          "layout": "overview",
+          "imageSize": [
+            1200.0,
+            800.0
+          ]
         }
       }
     },
     {
       "id": "about",
-      "blocks": [
-        {
-          "id": "about-title",
-          "type": "content",
-          "subtype": "header",
-          "placement": "top",
-          "size": "wide",
-          "content": {
-            "text": "ABOUT",
-            "fontWeight": 700
-          }
-        },
-        {
-          "id": "about-instagram",
-          "type": "interaction",
-          "placement": "bottomRightLowerLeft",
-          "size": "small",
-          "content": {
-            "label": "IG",
-            "fontWeight": 700,
-            "iconSrc": "/icons/instagram.svg"
-          },
-          "action": {
-            "type": "link",
-            "url": "https://www.instagram.com/cactus_de/"
-          }
-        },
-        {
-          "id": "about-github",
-          "type": "interaction",
-          "placement": "bottomRight",
-          "size": "small",
-          "content": {
-            "label": "GH",
-            "fontWeight": 700,
-            "iconSrc": "/icons/github.svg"
-          },
-          "action": {
-            "type": "link",
-            "url": "https://github.com/adityade8k"
-          }
-        },
-        {
-          "id": "about-linkedin",
-          "type": "interaction",
-          "placement": "bottomRightLowerRight",
-          "size": "small",
-          "content": {
-            "label": "IN",
-            "fontWeight": 700,
-            "iconSrc": "/icons/linkedin.svg"
-          },
-          "action": {
-            "type": "link",
-            "url": "https://www.linkedin.com/in/aditya-de-94222a163/"
-          }
-        },
-        {
-          "id": "about-face",
-          "type": "content",
-          "subtype": "image",
-          "placement": "aboutHeroImage",
-          "size": "medium",
-          "content": {
+      "template": "overlay",
+      "overlay": {
+        "kind": "about",
+        "title": "Aditya De",
+        "eyebrow": "ABOUT",
+        "context": "Creative technologist, designer & educator.",
+        "introLabel": "PRACTICE",
+        "introHeading": "Design, technology\n& education.",
+        "returnLabel": "BACK TO PORTFOLIO",
+        "closeLabel": "Close About",
+        "sections": [
+          {
+            "type": "image",
             "src": "/images/myFace.png",
             "alt": "Portrait of Aditya De"
-          }
-        },
-        {
-          "id": "about-copy-tall",
-          "type": "content",
-          "subtype": "text",
-          "placement": "aboutPracticeTop",
-          "size": "wide",
-          "content": {
-            "text": "Aditya's practice explores the juxtaposition of the digital and physical through browser-based 3D interaction, mixed reality experimentation, sound, and real-time creative technology.",
-            "fontWeight": 300
-          }
-        },
-        {
-          "id": "about-resume",
-          "type": "interaction",
-          "placement": "aboutImageBelow",
-          "size": "small",
-          "content": {
-            "label": "RESUME 2026",
-            "fontWeight": 700
           },
-          "action": {
+          {
+            "type": "text",
+            "content": "Aditya's practice explores the juxtaposition of the digital and physical through browser-based 3D interaction, mixed reality experimentation, sound, and real-time creative technology."
+          },
+          {
+            "type": "text",
+            "content": "As a developer and designer, he builds web-based spatial systems and prototypes mixed reality experiences that reimagine how people engage with space, bodies, and interfaces."
+          },
+          {
+            "type": "text",
+            "content": "As an educator, he is interested in how AI can be aligned with pedagogy, with a focus on process, experimentation, and learning through making."
+          },
+          {
+            "type": "heading",
+            "content": "Find me"
+          },
+          {
             "type": "link",
+            "label": "Résumé 2026",
             "url": "/files/ADITYADE_CV_2026.pdf"
-          }
-        },
-        {
-          "id": "about-copy-wide",
-          "type": "content",
-          "subtype": "text",
-          "placement": "aboutTall",
-          "size": "tall",
-          "content": {
-            "text": "As a developer and designer, he builds web-based spatial systems and prototypes mixed reality experiences that reimagine how people engage with space, bodies, and interfaces.",
-            "fontWeight": 300
-          }
-        },
-        {
-          "id": "about-copy-education",
-          "type": "content",
-          "subtype": "text",
-          "placement": "aboutLowerWide",
-          "size": "wide",
-          "content": {
-            "text": "As an educator, he is interested in how AI can be aligned with pedagogy, with a focus on process, experimentation, and learning through making.",
-            "fontWeight": 300
-          }
-        },
-        {
-          "id": "about-back",
-          "type": "interaction",
-          "placement": "topLeftStack1",
-          "size": "small",
-          "content": {
-            "label": "BACK",
-            "fontWeight": 700
           },
-          "action": {
-            "type": "back",
-            "target": "home"
+          {
+            "type": "link",
+            "label": "Instagram",
+            "url": "https://www.instagram.com/cactus_de/"
+          },
+          {
+            "type": "link",
+            "label": "GitHub",
+            "url": "https://github.com/adityade8k"
+          },
+          {
+            "type": "link",
+            "label": "LinkedIn",
+            "url": "https://www.linkedin.com/in/aditya-de-94222a163/"
           }
-        }
-      ]
+        ]
+      }
     },
     {
       "id": "fareCalculationSimulator",
@@ -1870,13 +2367,12 @@
         "imageAlt": "The fare simulator with a map, configurable rates, and running metrics.",
         "tags": [
           "SIMULATION",
-          "GOOGLE MAPS",
           "RESEARCH",
-          "GIG ECONOMY"
+          "DATA VIZ",
+          "SYSTEMS"
         ],
         "textBlocks": [
-          "For my 2021 pre-thesis project, I researched auto-rickshaw drivers in Bangalore and prototyped a simulator for exploring fare calculation models.",
-          "Users configure fuel cost, per-kilometer rate, base fare, and minimum distance, then follow average fares, take-home earnings, and fuel expenses."
+          "A simulator exploring how fuel costs and fare rules affect auto-rickshaw drivers’ earnings."
         ],
         "modal": {
           "title": "Fare Calculation Algorithm Simulator",
@@ -1890,7 +2386,9 @@
               "type": "image",
               "src": "/images/archive/fare-simulation-map.webp",
               "caption": "The fare simulator with a map, configurable rates, and running metrics.",
-              "alt": "The fare simulator with a map, configurable rates, and running metrics."
+              "alt": "The fare simulator with a map, configurable rates, and running metrics.",
+              "width": 1600,
+              "height": 813
             },
             {
               "type": "heading",
@@ -1910,7 +2408,7 @@
             },
             {
               "type": "text",
-              "content": "The simulator models auto-rickshaws picking up and dropping off passengers within a fixed area. I integrated the Google Maps API and made fare variables configurable, allowing users to observe how different settings affect earnings and expenses over time."
+              "content": "The simulator models auto-rickshaws picking up and dropping off passengers within a fixed area. Users can configure fuel cost, the per-kilometer rate, base fare, and minimum distance. As it runs, the interface tracks average fare, take-home earnings, and fuel expenses. I integrated the Google Maps API to ground the simulation in a real map."
             },
             {
               "type": "heading",
@@ -1920,12 +2418,38 @@
               "type": "text",
               "content": "Mathematical optimization can suggest an ideal fare model, but interviews showed that social and political factors often diverge from purely numerical solutions. The project helped me examine where a simulation can be useful and where lived experience complicates its assumptions."
             }
-          ]
+          ],
+          "metadata": {
+            "years": [
+              "2021"
+            ],
+            "organizations": [
+              "Srishti"
+            ],
+            "role": "Seventh-semester pre-thesis project"
+          },
+          "introHeading": "Making the economics of a ride visible."
         },
         "archiveSource": {
           "document": "AdityaDePortfolio (Portfolio 2025)",
           "pages": [
             16
+          ]
+        },
+        "metadata": {
+          "years": [
+            "2021"
+          ],
+          "organizations": [
+            "Srishti"
+          ],
+          "role": "Seventh-semester pre-thesis project"
+        },
+        "presentation": {
+          "layout": "overview",
+          "imageSize": [
+            1600,
+            813
           ]
         }
       }
@@ -1940,12 +2464,10 @@
         "tags": [
           "P5.JS",
           "DATA VIZ",
-          "GAME",
-          "ENVIRONMENT"
+          "CREATIVE CODING"
         ],
         "textBlocks": [
-          "Plastic Sweeper is a Minesweeper-inspired game I made in a 2019 studio led by Garret Lynch to communicate the scale of plastic pollution in the oceans.",
-          "The number of dangerous tiles was driven by live pollution data. As the amount of plastic increased, the game became harder to win."
+          "A Minesweeper-inspired game where ocean plastic data makes the grid harder to clear."
         ],
         "modal": {
           "title": "Plastic Sweeper — Live Interactive Data Visualization",
@@ -1959,7 +2481,9 @@
               "type": "image",
               "src": "/images/archive/plastic-sweeper-game.webp",
               "caption": "Plastic Sweeper: an ocean pollution visualization inspired by Minesweeper.",
-              "alt": "Plastic Sweeper: an ocean pollution visualization inspired by Minesweeper."
+              "alt": "Plastic Sweeper: an ocean pollution visualization inspired by Minesweeper.",
+              "width": 1600,
+              "height": 889
             },
             {
               "type": "text",
@@ -1977,14 +2501,26 @@
               "type": "image",
               "src": "/images/archive/plastic-sweeper-showcase.webp",
               "caption": "Plastic Sweeper in the p5.js 2020 showcase.",
-              "alt": "Plastic Sweeper in the p5.js 2020 showcase."
+              "alt": "Plastic Sweeper in the p5.js 2020 showcase.",
+              "width": 1600,
+              "height": 889
             },
             {
               "type": "link",
               "label": "Play Plastic Sweeper",
               "url": "https://kind-lovelace-0bae83.netlify.app/"
             }
-          ]
+          ],
+          "metadata": {
+            "years": [
+              "2019"
+            ],
+            "organizations": [
+              "Srishti"
+            ],
+            "role": "Third-semester studio"
+          },
+          "introHeading": "Playing through the scale of plastic pollution."
         },
         "archiveSource": {
           "document": "AdityaDePortfolio (Portfolio 2025)",
@@ -1995,7 +2531,24 @@
         "link": {
           "label": "PLAY",
           "url": "https://kind-lovelace-0bae83.netlify.app/"
-        }
+        },
+        "metadata": {
+          "years": [
+            "2019"
+          ],
+          "organizations": [
+            "Srishti"
+          ],
+          "role": "Third-semester studio"
+        },
+        "presentation": {
+          "layout": "overview",
+          "imageSize": [
+            1600,
+            889
+          ]
+        },
+        "tileTitle": "Plastic Sweeper"
       }
     },
     {
@@ -2008,12 +2561,10 @@
         "tags": [
           "ANIMATION",
           "STORYTELLING",
-          "VIDEO",
-          "COLLABORATION"
+          "AUDIOVISUAL"
         ],
         "textBlocks": [
-          "My animation work spans research, concepts, scripts, storyboards, shot lists, and video and audio editing, alongside collaboration with designers, animators, and sound engineers.",
-          "The archive includes class work for INTERIM 2019, a tribute to Girish Karnad, and a news explainer produced for Grasp."
+          "Animation and video production for INTERIM 2019 and Grasp, from research and storyboards to editing."
         ],
         "modal": {
           "title": "Animated Video Production",
@@ -2027,7 +2578,9 @@
               "type": "image",
               "src": "/images/archive/animation-interim-ensemble.webp",
               "caption": "A still from the class animation work for INTERIM 2019, a tribute to Girish Karnad.",
-              "alt": "A still from the class animation work for INTERIM 2019, a tribute to Girish Karnad."
+              "alt": "A still from the class animation work for INTERIM 2019, a tribute to Girish Karnad.",
+              "width": 842,
+              "height": 474
             },
             {
               "type": "text",
@@ -2039,7 +2592,7 @@
             },
             {
               "type": "text",
-              "content": "For A Festival of Performances, my class interpreted lines from Girish Karnad’s prose and developed visuals around the emotions in his writing."
+              "content": "For A Festival of Performances, my class at Srishti in 2019 interpreted lines from Girish Karnad’s prose and developed visuals around the emotions in his writing."
             },
             {
               "type": "link",
@@ -2050,7 +2603,9 @@
               "type": "image",
               "src": "/images/archive/animation-interim-flight.webp",
               "caption": "A second still from the INTERIM animation work.",
-              "alt": "A second still from the INTERIM animation work."
+              "alt": "A second still from the INTERIM animation work.",
+              "width": 843,
+              "height": 474
             },
             {
               "type": "link",
@@ -2063,25 +2618,57 @@
             },
             {
               "type": "text",
-              "content": "Grasp was a news media startup founded by a school friend. I produced its first YouTube video, an explainer about domestic violence in India."
+              "content": "Grasp was a news media startup founded by a school friend. In 2020, I produced its first YouTube video, an explainer about domestic violence in India."
             },
             {
               "type": "image",
               "src": "/images/archive/animation-grasp.webp",
               "caption": "A still from the Grasp news explainer.",
-              "alt": "A still from the Grasp news explainer."
+              "alt": "A still from the Grasp news explainer.",
+              "width": 858,
+              "height": 481
             },
             {
               "type": "link",
               "label": "Watch the Grasp explainer",
               "url": "https://www.youtube.com/watch?v=WoT8a76skhM"
             }
-          ]
+          ],
+          "metadata": {
+            "years": [
+              "2019",
+              "2020"
+            ],
+            "organizations": [
+              "Srishti",
+              "Grasp"
+            ],
+            "role": "Animation and video production"
+          },
+          "introHeading": "Stories told through animation."
         },
         "archiveSource": {
           "document": "AdityaDePortfolio (Portfolio 2025)",
           "pages": [
             24
+          ]
+        },
+        "metadata": {
+          "years": [
+            "2019",
+            "2020"
+          ],
+          "organizations": [
+            "Srishti",
+            "Grasp"
+          ],
+          "role": "Animation and video production"
+        },
+        "presentation": {
+          "layout": "overview",
+          "imageSize": [
+            842,
+            474
           ]
         }
       }
@@ -2094,14 +2681,12 @@
         "image": "/images/archive/fractal-mandelbrot.webp",
         "imageAlt": "A Mandelbrot fractal generated through repeated transformations of complex numbers.",
         "tags": [
-          "PYTHON",
-          "GENERATIVE ART",
-          "FRACTALS",
-          "MATHEMATICS"
+          "GENERATIVE",
+          "SYSTEMS",
+          "CREATIVE CODING"
         ],
         "textBlocks": [
-          "I am fascinated by the intricate nature of fractals and have explored different ways to generate them, from Mandelbrot sets to the Chaos Game.",
-          "These studies use repeated transformations and simple rules to produce complex, self-similar forms."
+          "Mandelbrot sets and Chaos Game studies exploring how simple rules generate complex, self-similar forms."
         ],
         "modal": {
           "title": "Fractal Generation",
@@ -2115,7 +2700,9 @@
               "type": "image",
               "src": "/images/archive/fractal-mandelbrot.webp",
               "caption": "A Mandelbrot fractal generated through repeated transformations of complex numbers.",
-              "alt": "A Mandelbrot fractal generated through repeated transformations of complex numbers."
+              "alt": "A Mandelbrot fractal generated through repeated transformations of complex numbers.",
+              "width": 363,
+              "height": 363
             },
             {
               "type": "text",
@@ -2128,19 +2715,25 @@
                   "type": "image",
                   "src": "/images/archive/fractal-monochrome.webp",
                   "caption": "A monochrome fractal study.",
-                  "alt": "A monochrome fractal study."
+                  "alt": "A monochrome fractal study.",
+                  "width": 363,
+                  "height": 363
                 },
                 {
                   "type": "image",
                   "src": "/images/archive/fractal-pink.webp",
                   "caption": "A color exploration of a generated fractal.",
-                  "alt": "A color exploration of a generated fractal."
+                  "alt": "A color exploration of a generated fractal.",
+                  "width": 363,
+                  "height": 363
                 },
                 {
                   "type": "image",
                   "src": "/images/archive/fractal-branching.webp",
                   "caption": "Branching detail in a fractal study.",
-                  "alt": "Branching detail in a fractal study."
+                  "alt": "Branching detail in a fractal study.",
+                  "width": 363,
+                  "height": 363
                 }
               ]
             },
@@ -2155,22 +2748,42 @@
                   "type": "image",
                   "src": "/images/archive/fractal-chaos-orange.webp",
                   "caption": "A rule-based fractal composition.",
-                  "alt": "A rule-based fractal composition."
+                  "alt": "A rule-based fractal composition.",
+                  "width": 1000,
+                  "height": 1000
                 },
                 {
                   "type": "image",
                   "src": "/images/archive/fractal-chaos-red.webp",
                   "caption": "A second exploration of recursive structure.",
-                  "alt": "A second exploration of recursive structure."
+                  "alt": "A second exploration of recursive structure.",
+                  "width": 1000,
+                  "height": 1000
                 }
               ]
             }
-          ]
+          ],
+          "metadata": {
+            "years": [],
+            "organizations": []
+          },
+          "introHeading": "Complex forms from simple rules."
         },
         "archiveSource": {
           "document": "AdityaDePortfolio (Portfolio 2025)",
           "pages": [
             18
+          ]
+        },
+        "metadata": {
+          "years": [],
+          "organizations": []
+        },
+        "presentation": {
+          "layout": "overview",
+          "imageSize": [
+            363,
+            363
           ]
         }
       }
@@ -2183,14 +2796,12 @@
         "image": "/images/archive/kantha-flappy-bird.webp",
         "imageAlt": "Flappy Bird rebuilt with embroidered game elements.",
         "tags": [
-          "EMBROIDERY",
-          "GAME",
           "ANIMATION",
-          "MATERIAL STUDY"
+          "MOTION",
+          "CREATIVE CODING"
         ],
         "textBlocks": [
-          "During an embroidery workshop with artisans in West Bengal, I explored how embroidery could become an art style for games and animation.",
-          "I recreated Snake and Flappy Bird by embroidering their elements and scanning them into digital assets. Flappy Bird includes a six-frame animation loop."
+          "Snake and Flappy Bird recreated with hand-embroidered game elements scanned into digital assets."
         ],
         "modal": {
           "title": "Kantha Games",
@@ -2204,11 +2815,13 @@
               "type": "image",
               "src": "/images/archive/kantha-flappy-bird.webp",
               "caption": "Flappy Bird rebuilt with embroidered game elements.",
-              "alt": "Flappy Bird rebuilt with embroidered game elements."
+              "alt": "Flappy Bird rebuilt with embroidered game elements.",
+              "width": 1600,
+              "height": 889
             },
             {
               "type": "text",
-              "content": "I wanted to carry the texture and character of hand embroidery into interactive digital work. Making the game elements physically and then scanning them let me work between those two processes."
+              "content": "I recreated Snake and Flappy Bird by embroidering the game elements and scanning them into digital assets. The Flappy Bird study includes a six-frame looping animation, carrying the texture and character of the hand-stitched work into the game."
             },
             {
               "type": "link",
@@ -2219,14 +2832,26 @@
               "type": "image",
               "src": "/images/archive/kantha-snake.webp",
               "caption": "Snake recreated using scanned embroidery.",
-              "alt": "Snake recreated using scanned embroidery."
+              "alt": "Snake recreated using scanned embroidery.",
+              "width": 1600,
+              "height": 889
             },
             {
               "type": "link",
               "label": "Play embroidered Snake",
               "url": "https://friendly-shaw-87bc32.netlify.app/"
             }
-          ]
+          ],
+          "metadata": {
+            "years": [
+              "2020"
+            ],
+            "organizations": [
+              "Srishti"
+            ],
+            "role": "Material exploration"
+          },
+          "introHeading": "Hand embroidery, made playable."
         },
         "archiveSource": {
           "document": "AdityaDePortfolio (Portfolio 2025)",
@@ -2237,6 +2862,22 @@
         "link": {
           "label": "PLAY",
           "url": "https://agitated-pike-bfdc12.netlify.app/"
+        },
+        "metadata": {
+          "years": [
+            "2020"
+          ],
+          "organizations": [
+            "Srishti"
+          ],
+          "role": "Material exploration"
+        },
+        "presentation": {
+          "layout": "overview",
+          "imageSize": [
+            1600,
+            889
+          ]
         }
       }
     },
@@ -2248,14 +2889,12 @@
         "image": "/images/archive/zoetrope-characters.webp",
         "imageAlt": "Animated characters arranged as successive frames around a circle.",
         "tags": [
-          "BLENDER",
-          "MIXAMO",
           "ANIMATION",
-          "MOTION"
+          "MOTION",
+          "SYSTEMS"
         ],
         "textBlocks": [
-          "These studies use the principles of the zoetrope, one of the earliest devices for creating the illusion of a moving image.",
-          "I animated characters with Mixamo and used Blender to render spaced frames into circular compositions."
+          "Mixamo characters rendered in Blender as circular sequences of still poses that suggest continuous movement."
         ],
         "modal": {
           "title": "Zoetrope Animation",
@@ -2269,11 +2908,13 @@
               "type": "image",
               "src": "/images/archive/zoetrope-characters.webp",
               "caption": "Animated characters arranged as successive frames around a circle.",
-              "alt": "Animated characters arranged as successive frames around a circle."
+              "alt": "Animated characters arranged as successive frames around a circle.",
+              "width": 1390,
+              "height": 1390
             },
             {
               "type": "text",
-              "content": "The experiments explore how a sequence of still poses can suggest continuous movement. I used the animation frames as elements in a repeating circular arrangement."
+              "content": "I used Mixamo to animate the characters, then rendered spaced animation frames in Blender. Arranging successive poses around a circle applies the zoetrope’s principle: a sequence of still images can create the illusion of continuous movement."
             },
             {
               "type": "gallery",
@@ -2282,13 +2923,17 @@
                   "type": "image",
                   "src": "/images/archive/zoetrope-red-blue.webp",
                   "caption": "A circular sequence of character poses.",
-                  "alt": "A circular sequence of character poses."
+                  "alt": "A circular sequence of character poses.",
+                  "width": 1390,
+                  "height": 1390
                 },
                 {
                   "type": "image",
                   "src": "/images/archive/zoetrope-pink.webp",
                   "caption": "Another arrangement of successive animation frames.",
-                  "alt": "Another arrangement of successive animation frames."
+                  "alt": "Another arrangement of successive animation frames.",
+                  "width": 1390,
+                  "height": 1390
                 }
               ]
             },
@@ -2297,7 +2942,12 @@
               "label": "Watch the zoetrope animation",
               "url": "https://www.instagram.com/reel/CusGNlkgM93/"
             }
-          ]
+          ],
+          "metadata": {
+            "years": [],
+            "organizations": []
+          },
+          "introHeading": "Still poses, continuous motion."
         },
         "archiveSource": {
           "document": "AdityaDePortfolio (Portfolio 2025)",
@@ -2308,6 +2958,17 @@
         "link": {
           "label": "WATCH",
           "url": "https://www.instagram.com/reel/CusGNlkgM93/"
+        },
+        "metadata": {
+          "years": [],
+          "organizations": []
+        },
+        "presentation": {
+          "layout": "overview",
+          "imageSize": [
+            1390,
+            1390
+          ]
         }
       }
     },
@@ -2322,11 +2983,10 @@
           "CYANOTYPE",
           "PRINTMAKING",
           "ANIMATION",
-          "MATERIAL STUDY"
+          "MOTION"
         ],
         "textBlocks": [
-          "I experimented with creating animations digitally and rendering their individual frames as cyanotype prints.",
-          "The process brings traditional printmaking into an animation workflow. One sequence began with frames extracted from a music video."
+          "Digital animation frames rendered as cyanotype prints, bringing physical texture into moving images."
         ],
         "modal": {
           "title": "Cyanotype Animation",
@@ -2340,7 +3000,9 @@
               "type": "image",
               "src": "/images/archive/cyanotype-frame.webp",
               "caption": "An animation frame rendered as a cyanotype print.",
-              "alt": "An animation frame rendered as a cyanotype print."
+              "alt": "An animation frame rendered as a cyanotype print.",
+              "width": 244,
+              "height": 340
             },
             {
               "type": "text",
@@ -2353,19 +3015,25 @@
                   "type": "image",
                   "src": "/images/archive/cyanotype-frame-01.webp",
                   "caption": "A cyanotype frame from the first sequence.",
-                  "alt": "A cyanotype frame from the first sequence."
+                  "alt": "A cyanotype frame from the first sequence.",
+                  "width": 244,
+                  "height": 340
                 },
                 {
                   "type": "image",
                   "src": "/images/archive/cyanotype-frame-10.webp",
                   "caption": "A later frame in the sequence.",
-                  "alt": "A later frame in the sequence."
+                  "alt": "A later frame in the sequence.",
+                  "width": 244,
+                  "height": 340
                 },
                 {
                   "type": "image",
                   "src": "/images/archive/cyanotype-frame-15.webp",
                   "caption": "Another frame from the cyanotype animation.",
-                  "alt": "Another frame from the cyanotype animation."
+                  "alt": "Another frame from the cyanotype animation.",
+                  "width": 244,
+                  "height": 340
                 }
               ]
             },
@@ -2380,13 +3048,17 @@
                   "type": "image",
                   "src": "/images/archive/cyanotype-music-01.webp",
                   "caption": "A cyanotype made from an extracted music video frame.",
-                  "alt": "A cyanotype made from an extracted music video frame."
+                  "alt": "A cyanotype made from an extracted music video frame.",
+                  "width": 144,
+                  "height": 281
                 },
                 {
                   "type": "image",
                   "src": "/images/archive/cyanotype-music-15.webp",
                   "caption": "A later printed frame from the music video study.",
-                  "alt": "A later printed frame from the music video study."
+                  "alt": "A later printed frame from the music video study.",
+                  "width": 144,
+                  "height": 281
                 }
               ]
             },
@@ -2395,7 +3067,12 @@
               "label": "Watch the cyanotype animation",
               "url": "https://www.instagram.com/reel/DB8j7FjNl1i/"
             }
-          ]
+          ],
+          "metadata": {
+            "years": [],
+            "organizations": []
+          },
+          "introHeading": "Digital motion, printed by hand."
         },
         "archiveSource": {
           "document": "AdityaDePortfolio (Portfolio 2025)",
@@ -2407,6 +3084,17 @@
         "link": {
           "label": "WATCH",
           "url": "https://www.instagram.com/reel/DB8j7FjNl1i/"
+        },
+        "metadata": {
+          "years": [],
+          "organizations": []
+        },
+        "presentation": {
+          "layout": "overview",
+          "imageSize": [
+            244,
+            340
+          ]
         }
       }
     },
@@ -2420,12 +3108,12 @@
         "tags": [
           "THREE.JS",
           "P5.JS",
-          "GENERATIVE ART",
-          "SYSTEMS"
+          "GENERATIVE",
+          "SYSTEMS",
+          "CREATIVE CODING"
         ],
         "textBlocks": [
-          "A collection of generative studies: rectangle packing and terrain generation in Three.js, alongside a random sprite generator in p5.js.",
-          "The archive collects variations in color, spacing, shape, and structure across these experiments."
+          "Rectangle packing and terrain generation in Three.js, alongside a random sprite generator in p5.js."
         ],
         "modal": {
           "title": "Generative Compositions",
@@ -2439,7 +3127,9 @@
               "type": "image",
               "src": "/images/archive/generative-rectangle-packing.webp",
               "caption": "A rectangle-packing composition made with Three.js.",
-              "alt": "A rectangle-packing composition made with Three.js."
+              "alt": "A rectangle-packing composition made with Three.js.",
+              "width": 1600,
+              "height": 889
             },
             {
               "type": "heading",
@@ -2452,19 +3142,25 @@
                   "type": "image",
                   "src": "/images/archive/generative-packing-yellow.webp",
                   "caption": "A second rectangle-packing composition.",
-                  "alt": "A second rectangle-packing composition."
+                  "alt": "A second rectangle-packing composition.",
+                  "width": 1600,
+                  "height": 889
                 },
                 {
                   "type": "image",
                   "src": "/images/archive/generative-packing-red.webp",
                   "caption": "A red and cream variation.",
-                  "alt": "A red and cream variation."
+                  "alt": "A red and cream variation.",
+                  "width": 1600,
+                  "height": 889
                 },
                 {
                   "type": "image",
                   "src": "/images/archive/generative-packing-purple.webp",
                   "caption": "A purple variation.",
-                  "alt": "A purple variation."
+                  "alt": "A purple variation.",
+                  "width": 1600,
+                  "height": 889
                 }
               ]
             },
@@ -2479,13 +3175,17 @@
                   "type": "image",
                   "src": "/images/archive/generative-forest.webp",
                   "caption": "A generated landscape with trees.",
-                  "alt": "A generated landscape with trees."
+                  "alt": "A generated landscape with trees.",
+                  "width": 1600,
+                  "height": 889
                 },
                 {
                   "type": "image",
                   "src": "/images/archive/generative-terrain.webp",
                   "caption": "A low-poly terrain study.",
-                  "alt": "A low-poly terrain study."
+                  "alt": "A low-poly terrain study.",
+                  "width": 1600,
+                  "height": 889
                 }
               ]
             },
@@ -2497,14 +3197,21 @@
               "type": "image",
               "src": "/images/archive/generative-sprites.webp",
               "caption": "A collection of generated pixel sprites.",
-              "alt": "A collection of generated pixel sprites."
+              "alt": "A collection of generated pixel sprites.",
+              "width": 1600,
+              "height": 899
             },
             {
               "type": "link",
               "label": "Try the random sprite generator",
               "url": "https://zen-jones-bd7864.netlify.app/"
             }
-          ]
+          ],
+          "metadata": {
+            "years": [],
+            "organizations": []
+          },
+          "introHeading": "Compositions built from rules and variation."
         },
         "archiveSource": {
           "document": "AdityaDePortfolio (Portfolio 2025)",
@@ -2515,6 +3222,17 @@
         "link": {
           "label": "TRY IT",
           "url": "https://zen-jones-bd7864.netlify.app/"
+        },
+        "metadata": {
+          "years": [],
+          "organizations": []
+        },
+        "presentation": {
+          "layout": "overview",
+          "imageSize": [
+            1600,
+            889
+          ]
         }
       }
     },
@@ -2528,12 +3246,12 @@
         "tags": [
           "THREE.JS",
           "SOUND",
-          "FFT",
-          "AUDIOVISUAL"
+          "AUDIOVISUAL",
+          "DATA VIZ",
+          "MOTION"
         ],
         "textBlocks": [
-          "I use Fourier transforms to analyze audio and explore sound visualization in Three.js.",
-          "The extracted frequency data drives visual parameters, allowing elements in the scene to respond to sound in real time."
+          "Three.js visualizations that use audio frequency data to drive motion and respond to sound in real time."
         ],
         "modal": {
           "title": "Sound Visualization with FFT",
@@ -2547,11 +3265,13 @@
               "type": "image",
               "src": "/images/archive/sound-fft-green.webp",
               "caption": "A Three.js sound visualization driven by frequency data.",
-              "alt": "A Three.js sound visualization driven by frequency data."
+              "alt": "A Three.js sound visualization driven by frequency data.",
+              "width": 1080,
+              "height": 1080
             },
             {
               "type": "text",
-              "content": "These studies connect audio analysis to visual behavior. Frequency data becomes an input to the scene, changing the visual parameters as the sound changes."
+              "content": "Fourier transforms extract frequency data from an audio file. I use that data to change visual parameters in Three.js, making the elements on screen respond to the sound in real time."
             },
             {
               "type": "link",
@@ -2562,14 +3282,21 @@
               "type": "image",
               "src": "/images/archive/sound-fft-pink.webp",
               "caption": "A second audio-reactive Three.js study.",
-              "alt": "A second audio-reactive Three.js study."
+              "alt": "A second audio-reactive Three.js study.",
+              "width": 1080,
+              "height": 1080
             },
             {
               "type": "link",
               "label": "Watch the second sound visualization",
               "url": "https://www.instagram.com/reel/DAvlYZjt22Q/"
             }
-          ]
+          ],
+          "metadata": {
+            "years": [],
+            "organizations": []
+          },
+          "introHeading": "Frequency becomes form."
         },
         "archiveSource": {
           "document": "AdityaDePortfolio (Portfolio 2025)",
@@ -2580,6 +3307,17 @@
         "link": {
           "label": "WATCH",
           "url": "https://www.instagram.com/reel/C0ClBkttoh_/"
+        },
+        "metadata": {
+          "years": [],
+          "organizations": []
+        },
+        "presentation": {
+          "layout": "overview",
+          "imageSize": [
+            1080,
+            1080
+          ]
         }
       }
     },
@@ -2590,15 +3328,9 @@
         "title": "Origami",
         "image": "/images/archive/origami-orange.webp",
         "imageAlt": "An origami form from the archive.",
-        "tags": [
-          "ORIGAMI",
-          "PAPER",
-          "STRUCTURE",
-          "MATERIAL STUDY"
-        ],
+        "tags": [],
         "textBlocks": [
-          "I enjoy origami for the way it brings together precision, creativity, and structure.",
-          "Turning a sheet of paper into an intricate form connects with my interests in procedural design, fractals, 3D modeling, and animation."
+          "Folded paper studies exploring precision, structure, and the transformation of a flat sheet into complex forms."
         ],
         "modal": {
           "title": "Origami",
@@ -2612,7 +3344,9 @@
               "type": "image",
               "src": "/images/archive/origami-orange.webp",
               "caption": "An origami form from the archive.",
-              "alt": "An origami form from the archive."
+              "alt": "An origami form from the archive.",
+              "width": 408,
+              "height": 408
             },
             {
               "type": "text",
@@ -2625,25 +3359,218 @@
                   "type": "image",
                   "src": "/images/archive/origami-grey.webp",
                   "caption": "A folded paper study in grey.",
-                  "alt": "A folded paper study in grey."
+                  "alt": "A folded paper study in grey.",
+                  "width": 408,
+                  "height": 408
                 },
                 {
                   "type": "image",
                   "src": "/images/archive/origami-pink.webp",
                   "caption": "A folded paper figure.",
-                  "alt": "A folded paper figure."
+                  "alt": "A folded paper figure.",
+                  "width": 408,
+                  "height": 408
                 }
               ]
             }
-          ]
+          ],
+          "metadata": {
+            "years": [],
+            "organizations": []
+          },
+          "introHeading": "Exploring structure through folded paper."
         },
         "archiveSource": {
           "document": "AdityaDePortfolio (Portfolio 2025)",
           "pages": [
             25
           ]
+        },
+        "metadata": {
+          "years": [],
+          "organizations": []
+        },
+        "presentation": {
+          "layout": "overview",
+          "imageSize": [
+            408,
+            408
+          ]
+        }
+      }
+    },
+    {
+      "id": "hongOrchestra",
+      "template": "projectDetail",
+      "projectDetails": {
+        "title": "Honk Orchestra",
+        "image": "/images/project-placeholder.svg",
+        "imageAlt": "Placeholder for Honk Orchestra; project imagery to be added.",
+        "placeholder": true,
+        "tags": [
+          "XR / VR",
+          "SOUND",
+          "MOTION"
+        ],
+        "textBlocks": [
+          "XR, sound and motion at NYU ITP. Project documentation is coming soon."
+        ],
+        "metadata": {
+          "years": [
+            "2026"
+          ],
+          "organizations": [
+            "NYU ITP"
+          ]
+        },
+        "presentation": {
+          "layout": "overview",
+          "imageSize": [
+            1200,
+            800
+          ]
+        },
+        "modal": {
+          "title": "Honk Orchestra",
+          "metadata": {
+            "years": [
+              "2026"
+            ],
+            "organizations": [
+              "NYU ITP"
+            ]
+          },
+          "introHeading": "Documentation coming soon.",
+          "sections": [
+            {
+              "type": "text",
+              "content": "XR, sound and motion at NYU ITP. Project documentation is coming soon."
+            },
+            {
+              "type": "image",
+              "src": "/images/project-placeholder.svg",
+              "alt": "Placeholder for Honk Orchestra.",
+              "caption": "Project imagery to be added."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "nyuK12XrCohort2026",
+      "template": "projectDetail",
+      "projectDetails": {
+        "title": "NYU K12 XR Cohort 2026",
+        "image": "/images/project-placeholder.svg",
+        "imageAlt": "Placeholder for NYU K12 XR Cohort 2026; project imagery to be added.",
+        "placeholder": true,
+        "tags": [
+          "THREE.JS",
+          "XR / VR",
+          "CREATIVE CODING",
+          "PEDAGOGY"
+        ],
+        "textBlocks": [
+          "NYU K12 XR cohort. Project documentation is coming soon."
+        ],
+        "metadata": {
+          "years": [
+            "2026"
+          ],
+          "organizations": [
+            "NYU K12 STEM"
+          ]
+        },
+        "presentation": {
+          "layout": "overview",
+          "imageSize": [
+            1200,
+            800
+          ]
+        },
+        "modal": {
+          "title": "NYU K12 XR Cohort 2026",
+          "metadata": {
+            "years": [
+              "2026"
+            ],
+            "organizations": [
+              "NYU K12 STEM"
+            ]
+          },
+          "introHeading": "Documentation coming soon.",
+          "sections": [
+            {
+              "type": "text",
+              "content": "NYU K12 XR cohort. Project documentation is coming soon."
+            },
+            {
+              "type": "image",
+              "src": "/images/project-placeholder.svg",
+              "alt": "Placeholder for NYU K12 XR Cohort 2026.",
+              "caption": "Project imagery to be added."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "algorithmsOfExploitation",
+      "template": "projectDetail",
+      "projectDetails": {
+        "title": "Algorithms of Exploitation",
+        "image": "/images/project-placeholder.svg",
+        "imageAlt": "Placeholder for Algorithms of Exploitation; project imagery to be added.",
+        "placeholder": true,
+        "tags": [
+          "RESEARCH"
+        ],
+        "textBlocks": [
+          "Research documentation is coming soon."
+        ],
+        "metadata": {
+          "years": [
+            "2022"
+          ],
+          "organizations": [
+            "Srishti"
+          ]
+        },
+        "presentation": {
+          "layout": "overview",
+          "imageSize": [
+            1200,
+            800
+          ]
+        },
+        "modal": {
+          "title": "Algorithms of Exploitation",
+          "metadata": {
+            "years": [
+              "2022"
+            ],
+            "organizations": [
+              "Srishti"
+            ]
+          },
+          "introHeading": "Documentation coming soon.",
+          "sections": [
+            {
+              "type": "text",
+              "content": "Research documentation is coming soon."
+            },
+            {
+              "type": "image",
+              "src": "/images/project-placeholder.svg",
+              "alt": "Placeholder for Algorithms of Exploitation.",
+              "caption": "Project imagery to be added."
+            }
+          ]
         }
       }
     }
+  ],
+  "unassignedTags": [
+    "AI"
   ]
 }

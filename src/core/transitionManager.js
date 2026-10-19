@@ -9,18 +9,21 @@ export class TransitionManager {
     overlapDelay = 180,
     floorY = 0,
     hideMargin = 0.18,
+    timeScale = 1,
+    pageTimeScale = 1,
   } = {}) {
-    this.duration = duration;
-    this.stagger = stagger;
-    this.ringDuration = ringDuration;
-    this.ringDelaySpread = ringDelaySpread;
-    this.overlapDelay = overlapDelay;
+    this.timeScale = timeScale;
+    this.duration = duration * timeScale * pageTimeScale;
+    this.stagger = stagger * timeScale * pageTimeScale;
+    this.ringDuration = ringDuration * timeScale * pageTimeScale;
+    this.ringDelaySpread = ringDelaySpread * timeScale * pageTimeScale;
+    this.overlapDelay = overlapDelay * timeScale;
     this.floorY = floorY;
     this.hideMargin = hideMargin;
     this.isTransitioning = false;
   }
 
-  async transitionToPage({ oldGroup, newGroupFactory, scene, onTransitionStart }) {
+  async transitionToPage({ oldGroup, newGroupFactory, scene, restoreGrid, moveCamera, clearGrid }) {
     if (this.isTransitioning) {
       return oldGroup;
     }
@@ -30,28 +33,23 @@ export class TransitionManager {
     const newGroup = newGroupFactory();
     scene.add(newGroup);
     this.setGroupProgress(newGroup, 0);
-    const transitionDuration = Math.max(
-      oldGroup ? this.getGroupAnimationDuration(oldGroup) : 0,
-      this.overlapDelay + this.getGroupAnimationDuration(newGroup),
-    );
-    const linkedAnimation = onTransitionStart?.({ duration: transitionDuration }) ?? Promise.resolve();
-
-    const exitPromise = oldGroup ? this.animateGroup(oldGroup, 'exit') : Promise.resolve();
-    const enterPromise = wait(this.overlapDelay).then(() => this.animateGroup(newGroup, 'enter'));
-
-    await exitPromise;
-    if (oldGroup) {
-      scene.remove(oldGroup);
-      disposeGroup(oldGroup);
+    try {
+      if (oldGroup) await this.animateGroup(oldGroup, 'exit');
+      if (oldGroup) {
+        scene.remove(oldGroup);
+        disposeGroup(oldGroup);
+      }
+      await restoreGrid?.();
+      await moveCamera?.();
+      await clearGrid?.(newGroup);
+      await this.animateGroup(newGroup, 'enter');
+      return newGroup;
+    } finally {
+      this.isTransitioning = false;
     }
-    await enterPromise;
-    await linkedAnimation;
-
-    this.isTransitioning = false;
-    return newGroup;
   }
 
-  async replaceChildren({ parent, oldChildren, newChildren }) {
+  async replaceChildren({ parent, oldChildren, newChildren, onTransitionStart }) {
     if (this.isTransitioning) {
       return false;
     }
@@ -62,16 +60,14 @@ export class TransitionManager {
       parent.add(child);
       this.setGroupProgress(child, 0);
     });
+    onTransitionStart?.();
 
-    const exitPromise = oldChildren.length > 0 ? this.animateObjects(oldChildren, 'exit') : Promise.resolve();
-    const enterPromise = wait(this.overlapDelay).then(() => this.animateObjects(newChildren, 'enter'));
-
-    await exitPromise;
+    if (oldChildren.length > 0) await this.animateObjects(oldChildren, 'exit');
     oldChildren.forEach((child) => {
       parent.remove(child);
       disposeGroup(child);
     });
-    await enterPromise;
+    await this.animateObjects(newChildren, 'enter');
 
     this.isTransitioning = false;
     return true;
@@ -102,13 +98,77 @@ export class TransitionManager {
     return Promise.all([centralAnimation, ringAnimation]);
   }
 
-  async transitionNavigation({ oldControls, newControls, moveCamera }) {
-    await this.animateObjects(oldControls, 'exit', { duration: 200, stagger: 20 });
-    oldControls.flatMap(getBlockMeshes).forEach((mesh) => { mesh.userData.skipPageTransition = true; });
-    newControls.forEach((block) => this.setGroupProgress(block, 0));
-    await moveCamera();
-    newControls.flatMap(getBlockMeshes).forEach((mesh) => { mesh.userData.skipPageTransition = false; });
-    await this.animateObjects(newControls, 'enter', { duration: 260, stagger: 20 });
+  setProjectTileActive(tile, active, progress = 1) {
+    tile.visible = active;
+    getBlockMeshes(tile).forEach((mesh) => { mesh.userData.skipPageTransition = !active; });
+    this.setGroupProgress(tile, active ? progress : 0);
+  }
+
+  async transitionProjectTile({ newTile, moveCamera, clearGrid }) {
+    if (this.isTransitioning) return;
+    this.isTransitioning = true;
+    try {
+      // Leave the destination filled with grid throughout the camera journey.
+      // Visited projects remain raised until the return to Home.
+      await moveCamera();
+      if (!newTile.visible) {
+        this.setProjectTileActive(newTile, true, 0);
+        await clearGrid?.();
+        await this.animateObjects([newTile], 'enter', {
+          duration: 260 * this.timeScale, stagger: 4 * this.timeScale,
+        });
+      }
+    } finally {
+      this.isTransitioning = false;
+    }
+  }
+
+  async returnThroughGallery({ gallery, returnPlan, newGroupFactory, scene, moveToDestination, restoreGrid, clearGrid, updateGrid, prepareFinalTile }) {
+    if (this.isTransitioning) return gallery;
+    this.isTransitioning = true;
+    try {
+      // Explore by Tags can reveal an unvisited first project during the return.
+      // Home keeps its existing behavior when no preparation hook is supplied.
+      const finalPreparation = prepareFinalTile?.(returnPlan.finalTile);
+      const departures = new Map();
+      const lowerPassedTiles = (progress) => {
+        for (const entry of returnPlan.departures) {
+          if (progress < entry.progress || departures.has(entry.tile)) continue;
+          const departure = this.animateObjects([entry.tile], 'exit', {
+            duration: 220 * this.timeScale, stagger: 4 * this.timeScale,
+          }).then(async () => {
+            this.setProjectTileActive(entry.tile, false);
+            await restoreGrid(gallery);
+          });
+          departures.set(entry.tile, departure);
+        }
+      };
+      lowerPassedTiles(0);
+      // One camera tween owns the entire return. Tile/grid animations overlap
+      // that journey and never create individual camera stops.
+      await moveToDestination(lowerPassedTiles);
+      lowerPassedTiles(1);
+      await Promise.all([...departures.values(), finalPreparation]);
+
+      const { finalTile } = returnPlan;
+      if (finalTile) {
+        await this.animateGroup(finalTile, 'exit');
+        this.setProjectTileActive(finalTile, false);
+      }
+      scene.remove(gallery);
+      disposeGroup(gallery);
+      const newGroup = newGroupFactory();
+      this.setGroupProgress(newGroup, 0);
+      scene.add(newGroup);
+      // At the first project, swap directly to the destination. A direct link
+      // may have left the origin as grid, so lower that grid before it emerges.
+      if (finalTile) updateGrid(newGroup);
+      else await clearGrid(newGroup);
+      await this.animateGroup(newGroup, 'enter');
+      return newGroup;
+    } finally {
+      this.isTransitioning = false;
+    }
   }
 
   animateObjects(objects, direction, { duration = this.duration, stagger = this.stagger } = {}) {
@@ -250,10 +310,4 @@ function clamp(value, min, max) {
 
 function lerp(start, end, progress) {
   return start + (end - start) * progress;
-}
-
-function wait(ms) {
-  return new Promise((resolve) => {
-    window.setTimeout(resolve, ms);
-  });
 }

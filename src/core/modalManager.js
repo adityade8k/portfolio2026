@@ -1,5 +1,8 @@
+import { ProjectDetails } from './cricketDetails.js';
+
 export class ModalManager {
   constructor() {
+    this.projectDetails = new ProjectDetails();
     this.overlay = document.querySelector('[data-modal-overlay]');
     this.dialog = document.querySelector('[data-modal-dialog]');
     this.title = document.querySelector('[data-modal-title]');
@@ -22,7 +25,13 @@ export class ModalManager {
     });
   }
 
-  openModal(modalData) {
+  openModal(modalData, { projectId, projectDetails, origin, onTag } = {}) {
+    if (projectDetails || projectId === 'liveBallData') {
+      this.closeModal();
+      this.projectDetails.open(modalData, origin, { onTag });
+      return;
+    }
+    this.projectDetails.close(true);
     this.previousFocus = document.activeElement;
     this.title.textContent = modalData.title ?? 'More Info';
     this.body.replaceChildren();
@@ -65,6 +74,15 @@ export class ModalManager {
     this.overlay.hidden = false;
     this.dialog.scrollTop = 0;
     this.dialog.focus();
+  }
+
+  openPage(data, { origin, onDismiss } = {}) {
+    this.closeModal();
+    this.projectDetails.open(data, origin, { onDismiss, routeManaged: true });
+  }
+
+  closePage() {
+    this.projectDetails.close(true);
   }
 
   closeModal() {

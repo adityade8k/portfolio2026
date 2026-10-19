@@ -1,0 +1,430 @@
+.cricket-details {
+  --cricket-red: #e23d28;
+  --cricket-blue: #1f5fbf;
+  --cricket-yellow: #f4c430;
+  --division: 3px;
+  --toolbar-height: calc(62px + env(safe-area-inset-top));
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  color: var(--ink);
+  font-family: var(--font-body);
+  outline: none;
+  isolation: isolate;
+  overflow-wrap: anywhere;
+}
+
+.cricket-details[hidden] { display: none; }
+
+.cricket-details__foundation {
+  position: absolute;
+  inset: 0;
+  background: var(--ink);
+  animation: cricket-foundation-in 500ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.cricket-details__scroll {
+  position: relative;
+  height: 100%;
+  overflow: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ink) var(--paper);
+  scroll-padding-top: var(--toolbar-height);
+}
+
+.cricket-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 34px 60px;
+  gap: var(--division);
+  padding: var(--division);
+  background: var(--ink);
+  min-height: var(--toolbar-height);
+}
+
+.cricket-panel {
+  min-width: 0;
+  background: var(--paper);
+  --exit-x: -110vw;
+}
+
+.cricket-panel[data-enter="right"] { --exit-x: 110vw; }
+
+.cricket-toolbar__label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: calc(18px + env(safe-area-inset-top)) 18px 18px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.cricket-toolbar__name {
+  display: none;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cricket-toolbar__label > :first-child { flex-shrink: 0; }
+.cricket-toolbar__accent { background: var(--cricket-blue); }
+
+.cricket-close {
+  display: grid;
+  place-items: center;
+  min-width: 56px;
+  min-height: 56px;
+  padding: env(safe-area-inset-top) 0 0;
+  border: 0;
+  border-radius: 0;
+  background: var(--cricket-yellow);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.cricket-close__cross { position: relative; width: 24px; height: 24px; }
+.cricket-close__cross::before,
+.cricket-close__cross::after {
+  content: "";
+  position: absolute;
+  top: 11px;
+  left: 0;
+  width: 24px;
+  height: 2px;
+  background: currentColor;
+  transform: rotate(45deg);
+}
+.cricket-close__cross::after { transform: rotate(-45deg); }
+
+.cricket-details__article {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100% - var(--toolbar-height));
+  gap: var(--division);
+  padding: 0 var(--division) var(--division);
+}
+.cricket-details__article > * { flex-shrink: 0; }
+
+.cricket-cover {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 48px;
+  grid-template-areas: "title accent" "context context" "media media";
+  gap: var(--division);
+}
+
+.cricket-cover--without-media { grid-template-areas: "title accent" "context context"; }
+.cricket-cover--without-context { grid-template-areas: "title accent" "media media"; }
+.cricket-cover--without-media.cricket-cover--without-context { grid-template-areas: "title accent"; }
+
+.cricket-cover__title {
+  grid-area: title;
+  display: flex;
+  align-items: center;
+  padding: 28px 20px 30px;
+}
+
+.cricket-cover h2 {
+  margin: 0;
+  width: 100%;
+  font-size: clamp(26px, 8.3vw, 48px);
+  font-weight: 700;
+  line-height: 1.04;
+  letter-spacing: -.035em;
+  text-align: left;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+
+.cricket-cover__accent { grid-area: accent; background: var(--cricket-red); }
+.cricket-cover__context {
+  grid-area: context;
+  padding: 18px 20px;
+  background: var(--cricket-yellow);
+}
+.cricket-cover__context p { margin: 0; font-size: 15px; line-height: 1.5; }
+.cricket-cover__context .cricket-eyebrow { margin-bottom: 14px; text-transform: uppercase; }
+.cricket-metadata { display: flex; flex-wrap: wrap; gap: 16px 28px; }
+.cricket-metadata__group { min-width: 0; }
+.cricket-metadata__label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 11px;
+  line-height: 1.35;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+.cricket-metadata__values { display: flex; flex-wrap: wrap; gap: 3px 12px; }
+.cricket-tag {
+  max-width: 100%;
+  min-height: 40px;
+  padding: 7px 0;
+  border: 0;
+  border-radius: 0;
+  color: inherit;
+  background: none;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+button.cricket-tag { cursor: pointer; text-decoration: underline; text-underline-offset: 4px; }
+.cricket-details .cricket-tag:focus-visible { outline-offset: 3px; }
+.cricket-cover__media { grid-area: media; }
+
+.cricket-figure { display: flex; flex-direction: column; margin: 0; height: 100%; }
+.cricket-figure img,
+.cricket-figure video {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  background: var(--ink);
+}
+.cricket-figure video { aspect-ratio: 16 / 9; max-height: 80svh; }
+.cricket-figure figcaption {
+  padding: 13px 20px 15px;
+  border-top: var(--division) solid var(--ink);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.45;
+  text-align: left;
+}
+
+.cricket-introduction,
+.cricket-chapter,
+.cricket-gallery,
+.cricket-story-row { display: grid; gap: var(--division); }
+
+.cricket-introduction__label {
+  padding: 24px 20px;
+  background: var(--cricket-blue);
+  color: var(--paper);
+}
+.cricket-eyebrow {
+  display: block;
+  margin: 0;
+  font-size: 11px !important;
+  font-weight: 700;
+  line-height: 1.3 !important;
+  letter-spacing: .06em;
+}
+.cricket-introduction__label h3 {
+  margin: 22px 0 0;
+  font-size: 30px;
+  line-height: 1.1;
+  font-weight: 400;
+  letter-spacing: -.025em;
+  white-space: pre-line;
+}
+.cricket-introduction__copy,
+.cricket-chapter__copy {
+  padding: 26px 20px 30px;
+}
+.cricket-introduction__copy p,
+.cricket-chapter__copy p {
+  margin: 0;
+  max-width: 62ch;
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.55;
+  text-align: left;
+}
+.cricket-introduction__copy p + p,
+.cricket-chapter__copy p + p { margin-top: 1.1em; }
+
+.cricket-chapter__heading {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  align-items: start;
+  gap: 18px;
+  padding: 26px 20px;
+  background: var(--cricket-yellow);
+}
+.cricket-chapter__heading .cricket-eyebrow { padding-top: 6px; }
+.cricket-chapter__heading h3 {
+  max-width: 22ch;
+  margin: 0;
+  font-size: 27px;
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -.025em;
+}
+.cricket-chapter--2 > .cricket-chapter__heading { background: var(--paper); }
+.cricket-chapter--3 > .cricket-chapter__heading { background: var(--cricket-blue); color: var(--paper); }
+.cricket-chapter--4 > .cricket-chapter__heading { background: var(--cricket-red); }
+
+.cricket-link-panel { background: var(--cricket-yellow); }
+.cricket-link,
+.cricket-return {
+  display: flex;
+  width: 100%;
+  min-height: 72px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 22px 20px;
+  color: var(--ink);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.35;
+  text-decoration: none;
+  text-align: left;
+}
+.cricket-link span,
+.cricket-return span { font-size: 27px; font-weight: 400; }
+.cricket-details__footer { flex-grow: 1; padding-bottom: env(safe-area-inset-bottom); }
+.cricket-return { border: 0; background: transparent; cursor: pointer; }
+.cricket-details button:focus-visible,
+.cricket-details a:focus-visible,
+.cricket-details video:focus-visible { outline: 3px solid currentColor; outline-offset: -7px; }
+
+@media (hover: hover) {
+  .cricket-close:hover { background: var(--paper); }
+  .cricket-tag:hover,
+  .cricket-link:hover,
+  .cricket-return:hover { text-decoration: underline; text-underline-offset: 5px; }
+}
+
+/* The opening is one composition: panels travel, type never stretches. */
+.cricket-details[data-state="open"] .cricket-toolbar > .cricket-panel,
+.cricket-details[data-state="open"] .cricket-cover > .cricket-panel,
+.cricket-details[data-state="open"] .cricket-introduction > .cricket-panel {
+  animation: cricket-panel-in 560ms cubic-bezier(.22, 1, .36, 1) both;
+  animation-delay: var(--enter-delay, 0ms);
+}
+.cricket-details[data-state="open"] .cricket-panel[data-enter="expand"] {
+  animation-name: cricket-panel-expand;
+}
+.cricket-details[data-state="closing"] .cricket-details__scroll { overflow: hidden; }
+.cricket-details[data-state="closing"] .cricket-panel {
+  animation: cricket-panel-out 260ms cubic-bezier(.55, 0, 1, .45) both;
+}
+.cricket-details[data-state="closing"] .cricket-details__foundation {
+  animation: cricket-foundation-out 260ms ease both;
+}
+
+@keyframes cricket-panel-in {
+  from { transform: translateX(var(--exit-x)); opacity: 0; }
+  8% { opacity: 1; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@keyframes cricket-panel-expand {
+  from { clip-path: inset(50% 50%); }
+  to { clip-path: inset(0); }
+}
+@keyframes cricket-foundation-in {
+  from { clip-path: inset(var(--reveal-y) calc(100% - var(--reveal-x)) calc(100% - var(--reveal-y)) var(--reveal-x)); }
+  to { clip-path: inset(0); }
+}
+@keyframes cricket-panel-out {
+  from { transform: var(--close-transform, none); opacity: var(--close-opacity, 1); clip-path: var(--close-clip, none); }
+  to { transform: translateX(var(--exit-x)); opacity: 0; }
+}
+@keyframes cricket-foundation-out {
+  0%, 45% { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@media (min-width: 700px) and (max-width: 959px) {
+  .cricket-cover { grid-template-columns: minmax(0, 1fr) 96px; }
+  .cricket-cover h2 { max-width: 16ch; font-size: 58px; }
+  .cricket-cover__title { padding: 38px; }
+  .cricket-introduction__copy,
+  .cricket-chapter__copy { padding: 36px; }
+}
+
+@media (min-width: 960px) {
+  .cricket-details { --division: 4px; --toolbar-height: 72px; }
+  .cricket-toolbar { grid-template-columns: minmax(0, 1fr) 100px 72px; }
+  .cricket-toolbar__label { padding: 22px 32px; font-size: 13px; }
+  .cricket-toolbar__name { display: inline; }
+  .cricket-close { min-height: 64px; }
+  .cricket-cover {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-template-rows: minmax(300px, 1fr) auto;
+    grid-template-areas: none;
+  }
+  .cricket-cover__title { grid-column: 1 / 5; grid-row: 1; padding: 38px 32px; }
+  .cricket-cover h2 { font-size: clamp(26px, 2.8vw, 64px); max-width: 100%; }
+  .cricket-cover__accent { grid-column: 5 / 6; grid-row: 1; }
+  .cricket-cover__context { grid-column: 1 / 6; grid-row: 2; padding: 24px 32px; }
+  .cricket-cover__context p { font-size: 17px; }
+  .cricket-tag { font-size: 17px; }
+  .cricket-cover__media { grid-column: 6 / 13; grid-row: 1 / 3; display: flex; align-items: center; }
+  .cricket-cover__media .cricket-figure { width: 100%; height: auto; }
+  .cricket-cover__media img { max-height: 78svh; }
+  .cricket-cover--without-context { grid-template-rows: minmax(300px, auto); }
+  .cricket-cover--without-context .cricket-cover__media { grid-row: 1; }
+  .cricket-cover--without-media { grid-template-rows: minmax(240px, auto) auto; }
+  .cricket-cover--without-media .cricket-cover__title { grid-column: 1 / 11; }
+  .cricket-cover--without-media .cricket-cover__accent { grid-column: 11 / 13; }
+  .cricket-cover--without-media .cricket-cover__context { grid-column: 1 / -1; }
+  .cricket-cover--without-media.cricket-cover--without-context { grid-template-rows: minmax(240px, auto); }
+  .cricket-figure figcaption { padding: 17px 28px; font-size: 14px; }
+  .cricket-introduction { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+  .cricket-introduction__label { grid-column: 1 / 5; padding: 38px 32px; }
+  .cricket-introduction__label h3 { font-size: clamp(32px, 3.1vw, 52px); margin-top: 45px; }
+  .cricket-introduction__copy { grid-column: 5 / 13; padding: 40px clamp(32px, 4vw, 72px); }
+  .cricket-introduction__copy p,
+  .cricket-chapter__copy p { font-size: 18px; line-height: 1.6; }
+  .cricket-chapter { grid-template-columns: repeat(12, minmax(0, 1fr)); align-items: stretch; }
+  .cricket-chapter__heading { grid-column: 1 / -1; grid-template-columns: 55px 1fr; padding: 32px; align-items: center; }
+  .cricket-chapter__heading h3 { max-width: none; font-size: clamp(30px, 2.8vw, 46px); }
+  .cricket-chapter__heading .cricket-eyebrow { padding-top: 0; }
+  .cricket-story-row { grid-column: 1 / -1; grid-template-columns: repeat(12, minmax(0, 1fr)); }
+  .cricket-story-row > * { grid-column: 1 / -1; }
+  .cricket-story-row--paired > .cricket-chapter__copy { grid-column: 1 / 5; }
+  .cricket-story-row--paired > .cricket-media,
+  .cricket-story-row--paired > .cricket-gallery { grid-column: 5 / 13; }
+  .cricket-chapter__copy { padding: 32px; }
+  .cricket-story-row--text > .cricket-chapter__copy { padding: 36px clamp(32px, 8vw, 120px); }
+  .cricket-story-row--text > .cricket-chapter__copy p { max-width: 75ch; }
+  .cricket-story-row--media > .cricket-media { display: flex; justify-content: center; }
+  .cricket-story-row--media > .cricket-media > .cricket-figure { width: min(100%, 1200px); }
+  .cricket-story-row--media img { max-height: 85svh; }
+  .cricket-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cricket-gallery > :last-child:nth-child(odd) { grid-column: 1 / -1; }
+  .cricket-gallery img { max-height: 70svh; }
+  .cricket-link-panel { grid-column: 1 / -1; }
+  .cricket-link, .cricket-return { padding: 24px 32px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cricket-details *, .cricket-details *::before, .cricket-details *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* About shares the same panels, with a portrait and a compact contact grid. */
+.cricket-details[data-kind="about"] .cricket-cover__media img {
+  max-height: 42svh;
+  background: var(--paper);
+}
+.cricket-details[data-kind="about"] .cricket-chapter {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.cricket-details[data-kind="about"] .cricket-chapter__heading {
+  grid-column: 1 / -1;
+}
+.cricket-details[data-kind="about"] .cricket-link-panel { grid-column: auto; }
+.cricket-details[data-kind="about"] .cricket-link { min-height: 88px; }
+.cricket-details[data-kind="about"] .cricket-link-panel:nth-child(3) { background: var(--cricket-red); }
+.cricket-details[data-kind="about"] .cricket-link-panel:nth-child(4) { background: var(--cricket-blue); }
+.cricket-details[data-kind="about"] .cricket-link-panel:nth-child(4) .cricket-link { color: var(--paper); }
+.cricket-details[data-kind="about"] .cricket-link-panel:nth-child(5) { background: var(--paper); }
+@media (min-width: 960px) {
+  .cricket-details[data-kind="about"] .cricket-cover h2 { font-size: clamp(54px, 7vw, 110px); }
+  .cricket-details[data-kind="about"] .cricket-cover__media img { max-height: 58svh; }
+  .cricket-details[data-kind="about"] .cricket-chapter { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}

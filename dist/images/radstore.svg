@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-labelledby="title desc">
+  <title id="title">Radstore virtual store</title>
+  <desc id="desc">Abstract virtual showroom with product plinths, screens, and store navigation.</desc>
+  <rect width="1200" height="800" fill="#f7f3e8"/>
+  <rect x="82" y="76" width="1036" height="648" fill="#111111"/>
+  <rect x="142" y="132" width="916" height="540" fill="#f4c430"/>
+  <polygon points="190,625 1010,625 850,358 350,358" fill="#f7f3e8"/>
+  <rect x="220" y="178" width="230" height="140" fill="#1f5fbf"/>
+  <rect x="750" y="178" width="230" height="140" fill="#e23d28"/>
+  <g fill="#111111">
+    <rect x="312" y="472" width="208" height="42" rx="21"/>
+    <circle cx="350" cy="540" r="34"/>
+    <circle cx="482" cy="540" r="34"/>
+    <rect x="680" y="455" width="238" height="46" rx="23"/>
+    <circle cx="722" cy="530" r="38"/>
+    <circle cx="875" cy="530" r="38"/>
+  </g>
+  <g fill="#111111" font-family="Arial, Helvetica, sans-serif" font-weight="700">
+    <text x="252" y="265" font-size="42">360 STORE</text>
+    <text x="790" y="265" font-size="42">RAD</text>
+  </g>
+</svg>

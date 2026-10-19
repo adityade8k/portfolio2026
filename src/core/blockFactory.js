@@ -33,7 +33,7 @@ export function createBlock(blockData, textureLoader) {
   mesh.userData.blockData = blockData;
   mesh.userData.isBlockMesh = true;
   mesh.userData.originalHeight = blockData.height;
-  mesh.userData.originalY = blockData.height / 2;
+  mesh.userData.originalY = mesh.position.y;
   group.add(mesh);
 
   const edges = new THREE.LineSegments(
@@ -65,7 +65,7 @@ function createTopContent(blockData, textureLoader) {
   }
 
   if (blockData.subtype === 'image' && blockData.content?.src) {
-    return createImagePlane(blockData, textureLoader);
+    return createImagePlane(blockData, textureLoader, { fit: blockData.content.fit, scale: blockData.content.imageScale });
   }
 
   return createTextLabel(blockData);
@@ -157,12 +157,13 @@ function createTextLabel(blockData) {
   text.font = getFontUrl(blockData);
   text.fontWeight = getFontWeight(blockData);
   text.fontSize = getFontSize(blockData);
-  text.maxWidth = Math.max(0.2, blockData.worldW - 0.28);
-  text.textAlign = 'center';
+  text.maxWidth = Math.max(0.2, blockData.worldW - (blockData.content?.padding ?? 0.28));
+  text.lineHeight = blockData.content?.lineHeight ?? 'normal';
+  text.textAlign = blockData.content?.textAlign ?? 'center';
   text.color = getTextColor(blockData.color);
-  text.anchorX = 'center';
+  text.anchorX = text.textAlign === 'left' ? 'left' : 'center';
   text.anchorY = 'middle';
-  text.position.set(0, blockData.height / 2 + 0.018, 0);
+  text.position.set(text.textAlign === 'left' ? -text.maxWidth / 2 : 0, blockData.height / 2 + 0.018, 0);
   text.rotation.x = -Math.PI / 2;
   text.sync();
 
@@ -213,17 +214,26 @@ function createImagePlane(blockData, textureLoader, options = {}) {
   );
   plane.rotation.x = -Math.PI / 2;
   plane.position.set(0, blockData.height / 2 + 0.024, 0);
+  let disposed = false;
+  plane.material.addEventListener('dispose', () => {
+    disposed = true;
+    plane.material.map?.dispose();
+  });
 
   loadTexture(src, textureLoader, options)
-    .then((texture) => {
+    .then((sourceTexture) => {
+      if (disposed) return;
+      // Each tile has its own fitting: a thumbnail must not crop another tile's image.
+      const texture = sourceTexture.clone();
       texture.colorSpace = THREE.SRGBColorSpace;
       texture.wrapS = THREE.ClampToEdgeWrapping;
       texture.wrapT = THREE.ClampToEdgeWrapping;
       if (options.fit === 'contain') {
-        applyContainFit(texture, blockData.worldW, blockData.worldD);
+        applyContainFit(plane, texture, blockData.worldW, blockData.worldD);
       } else {
         applyCoverCrop(texture, blockData.worldW, blockData.worldD);
       }
+      texture.needsUpdate = true;
       plane.material.map = texture;
       plane.material.needsUpdate = true;
       plane.visible = true;
@@ -324,7 +334,7 @@ function applyCoverCrop(texture, width, depth) {
   }
 }
 
-function applyContainFit(texture, width, depth) {
+function applyContainFit(plane, texture, width, depth) {
   const image = texture.image;
   if (!image?.width || !image?.height) {
     return;
@@ -333,13 +343,10 @@ function applyContainFit(texture, width, depth) {
   const imageAspect = image.width / image.height;
   const planeAspect = width / depth;
 
-  texture.center.set(0.5, 0.5);
-
-  if (imageAspect > planeAspect) {
-    texture.repeat.set(1, imageAspect / planeAspect);
-  } else {
-    texture.repeat.set(planeAspect / imageAspect, 1);
-  }
+  texture.repeat.set(1, 1);
+  texture.offset.set(0, 0);
+  plane.scale.x = Math.min(1, imageAspect / planeAspect);
+  plane.scale.y = Math.min(1, planeAspect / imageAspect);
 }
 
 function getFontSize(blockData) {

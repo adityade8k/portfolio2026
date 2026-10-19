@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-labelledby="title desc">
+<svg width="1200.0" height="800.0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-labelledby="title desc">
   <title id="title">XR Tone Synthesizer and Beat Sequencer</title>
   <desc id="desc">Abstract XR sound interface with waveform, sequencer pads, and spatial rings.</desc>
   <rect width="1200" height="800" fill="#f7f3e8"/>

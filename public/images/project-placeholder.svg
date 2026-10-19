@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800" role="img" aria-labelledby="title desc">
+  <title id="title">Project image placeholder</title>
+  <desc id="desc">An abstract composition of cream, blue, red and yellow panels. Project imagery will be added later.</desc>
+  <rect width="1200" height="800" fill="#f7f3e8"/>
+  <g stroke="#111111" stroke-width="12">
+    <rect x="90" y="80" width="1020" height="640" fill="#f7f3e8"/>
+    <rect x="90" y="80" width="370" height="420" fill="#1f5fbf"/>
+    <rect x="460" y="80" width="650" height="160" fill="#f7f3e8"/>
+    <rect x="460" y="240" width="480" height="480" fill="#f7f3e8"/>
+    <rect x="940" y="240" width="170" height="480" fill="#e23d28"/>
+    <rect x="90" y="500" width="370" height="220" fill="#f4c430"/>
+  </g>
+  <path d="M620 480h160M700 400v160" stroke="#111111" stroke-width="12"/>
+</svg>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-labelledby="title desc">
+  <title id="title">Habit and Behaviour Lab</title>
+  <desc id="desc">Abstract lab scene with EEG signal, brain activity, and VR research panels.</desc>
+  <rect width="1200" height="800" fill="#f7f3e8"/>
+  <rect x="78" y="72" width="1044" height="656" fill="#111111"/>
+  <circle cx="380" cy="350" r="150" fill="#1f5fbf"/>
+  <path d="M282 352 C315 240 430 244 470 322 C520 322 548 386 508 438 C440 520 300 482 282 352Z" fill="#f7f3e8"/>
+  <path d="M190 590 C265 470 334 694 410 574 S560 470 636 574 S786 694 862 574 S1012 470 1086 590" fill="none" stroke="#e23d28" stroke-width="16" stroke-linecap="round"/>
+  <rect x="675" y="180" width="300" height="110" fill="#f4c430"/>
+  <rect x="675" y="350" width="220" height="86" fill="#d8d2c4"/>
+  <rect x="675" y="500" width="260" height="86" fill="#f7f3e8"/>
+</svg>

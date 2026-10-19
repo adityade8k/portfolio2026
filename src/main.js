@@ -1,4 +1,5 @@
 import './style.css';
+import './cricketDetails.css';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import pagesData from './data/pages.json';
@@ -8,51 +9,34 @@ import { ModalManager } from './core/modalManager.js';
 import { StateManager } from './core/stateManager.js';
 import { TransitionManager } from './core/transitionManager.js';
 import { getNewestProjectItems, getProjectNavigation, resolveCategoryPageId } from './core/projectNavigation.js';
-import { createProjectGallery, getProjectTilePosition, getProjectNavigationBlocks } from './core/projectGallery.js';
-import { InfiniteGrid } from './core/infiniteGrid.js';
+import { createProjectGallery, getProjectTilePosition, recordProjectVisit, getGalleryReturnPlan } from './core/projectGallery.js';
+import { InfiniteGrid, getBlockFootprints } from './core/infiniteGrid.js';
+import { DEFAULT_CAMERA, getCameraDevice, getViewportCameraFrame, getTopDownCameraLayout, getResizedViewSize, getSceneCameraOffset } from './core/cameraFraming.js';
+import { hasBlockAction, ReadingDrag, ContinuedOrbitDrag } from './core/readingView.js';
+import { getProjectTags, normalizeTag } from './core/projectTags.js';
+import { createTagsPage } from './core/tagDirectory.js';
 
 const canvas = document.querySelector('#scene');
 const cameraDebugOverlay = createCameraDebugOverlay();
-const isMobile = window.innerWidth < 768;
 const fallbackPageId = 'home';
 const fillerRings = 0;
 const floorY = -0.0002;
+const transitionTimeScale = 0.7;
+const blockSwapDurationScale = 0.3 / 0.7;
+const blockTransitionTimeScale = transitionTimeScale * blockSwapDurationScale;
+const pageSwapTimeScale = 1 / 1.5;
+const cameraTravelTimeScale = 0.7;
 const maxDevicePixelRatio = 3;
+const projectsPerPage = 3;
+const projectRowSlotCount = 5;
 const defaultCameraConfig = {
   mobile: {
-    cameraY: 8.2,
-    polarAngleDegrees: 40,
-    azimuthAngleDegrees: 32,
-    viewSize: 22,
-    position: new THREE.Vector3(2, 8.2, 5),
-    zoom: 0.01,
+    ...DEFAULT_CAMERA,
     target: new THREE.Vector3(0, 0, 0),
   },
   desktop: {
-    cameraY: 6.2,
-    polarAngleDegrees: 40,
-    azimuthAngleDegrees: 25.8,
-    viewSize: 8.8,
-    position: new THREE.Vector3(3, 6.2, 6.2),
-    zoom: 2,
+    ...DEFAULT_CAMERA,
     target: new THREE.Vector3(0, 0, 0),
-  },
-};
-const panCameraConfig = {
-  // polar is measured down from vertical; azimuth rotates around the scene.
-  mobile: {
-    viewSize: 17,
-    cameraY: 8.2,
-    polarAngleDegrees: 0.1,
-    azimuthAngleDegrees: 0,
-    targetY: 0,
-  },
-  desktop: {
-    viewSize: 6.2,
-    cameraY: 9.2,
-    polarAngleDegrees: 2,
-    azimuthAngleDegrees: 0,
-    targetY: 0,
   },
 };
 const cameraControlsConfig = {
@@ -71,13 +55,18 @@ const cameraControlsConfig = {
   targetMax: new THREE.Vector3(2.5, 1.2, 3.8),
 };
 
-const initialTag = getTagFromUrl();
-if (initialTag) {
-  pagesData.pages.push(createTagProjectPage(initialTag, fallbackPageId));
-}
+const initialHistoryState = window.history.state ?? {};
+restoreNavigationPages(initialHistoryState, getPageIdFromUrl(), (page) => {
+  const index = pagesData.pages.findIndex((candidate) => candidate.id === page.id);
+  if (index < 0) pagesData.pages.push(page);
+  else pagesData.pages[index] = page;
+});
+const initialOverlayPageId = pagesData.pages.find((page) => page.id === getPageIdFromUrl() && page.template === 'overlay')?.id;
 const stateManager = new StateManager(pagesData, getInitialPageId());
 
 let currentCameraViewSize = getCameraLayout().viewSize;
+let viewportBaseViewSize = currentCameraViewSize;
+let viewportCameraDevice = getCurrentCameraDevice();
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xf3f0e8);
@@ -115,7 +104,7 @@ controls.update();
 const floor = new THREE.Mesh(
   new THREE.PlaneGeometry(200, 200),
   new THREE.MeshStandardMaterial({
-    color: 0xf3f0e8,
+    color: 0x000000,
     roughness: 0.82,
     metalness: 0,
   }),
@@ -141,13 +130,11 @@ const infiniteGrid = new InfiniteGrid();
 scene.add(infiniteGrid);
 
 const modalManager = new ModalManager();
-const transitionManager = new TransitionManager({ floorY });
+const transitionManager = new TransitionManager({ floorY, timeScale: blockTransitionTimeScale, pageTimeScale: pageSwapTimeScale });
 const textureLoader = new THREE.TextureLoader();
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
 const cameraResetTarget = new THREE.Vector3();
-const cameraTextTarget = new THREE.Vector3();
-const cameraTextOffset = new THREE.Vector3();
 const cameraStartPosition = new THREE.Vector3();
 const cameraEndPosition = new THREE.Vector3();
 const cameraStartTarget = new THREE.Vector3();
@@ -164,11 +151,9 @@ const cameraResetThresholds = {
   rotationRadians: THREE.MathUtils.degToRad(0.25),
   viewSize: 0.001,
 };
-const projectsPerPage = 3;
-const projectRowSlotCount = 5;
-
 let projectsCarouselPage = 0;
 let previousPageId = fallbackPageId;
+let galleryBackTarget = getSavedGalleryBackTarget(initialHistoryState);
 let currentGroup = buildPageGroup(stateManager.getCurrentPage());
 let hoveredMesh = null;
 let cameraResetAnimationId = 0;
@@ -176,32 +161,45 @@ let isCameraResetting = false;
 let isPageTransitioning = false;
 let hasInitializedViewport = false;
 let queuedNavigation = null;
+let cameraViewMode = 'default';
+let readingLayout = null;
+let pointerGesture = null;
+let activeOverlayPageId = null;
 scene.add(currentGroup);
+infiniteGrid.setExclusions(getBlockFootprints([currentGroup]));
 
-canvas.addEventListener('pointermove', handlePointerMove);
+// Capture reading gestures before OrbitControls can rotate or pan the camera.
+canvas.addEventListener('pointermove', handlePointerMove, true);
 canvas.addEventListener('pointerleave', clearHover);
-canvas.addEventListener('pointerdown', handlePointerDown);
+canvas.addEventListener('pointerdown', handlePointerDown, true);
+canvas.addEventListener('pointerup', handlePointerUp, true);
+canvas.addEventListener('pointercancel', handlePointerCancel, true);
+canvas.addEventListener('lostpointercapture', handlePointerCancel);
 window.addEventListener('popstate', handlePopState);
-syncUrlToPage(stateManager.currentPageId, { replace: true });
+if (!initialOverlayPageId) syncUrlToPage(stateManager.currentPageId, { replace: true, historyState: getNavigationHistoryState() });
 
 function resize() {
   const width = window.innerWidth;
   const height = window.innerHeight;
   const aspect = width / height;
-  const layout = getCameraLayout(camera.zoom);
-
-  const isGallery = Boolean(currentGroup.userData.categoryId);
-  const viewSize = isGallery && hasInitializedViewport
-    ? layout.viewSize
-    : hasInitializedViewport ? currentCameraViewSize : layout.viewSize;
+  const defaultLayout = getCameraLayout();
+  const layout = cameraViewMode === 'top' ? getReadingCameraLayout() : defaultLayout;
+  const device = getCurrentCameraDevice();
+  const cameraDeviceChanged = device !== viewportCameraDevice;
+  const viewSize = hasInitializedViewport && !cameraDeviceChanged && cameraViewMode !== 'top'
+    ? getResizedViewSize(currentCameraViewSize, viewportBaseViewSize, layout.viewSize)
+    : layout.viewSize;
+  viewportBaseViewSize = defaultLayout.viewSize;
+  viewportCameraDevice = device;
   applyCameraViewSize(viewSize, aspect);
 
-  if (!hasInitializedViewport) {
+  if (!hasInitializedViewport || cameraDeviceChanged || cameraViewMode === 'top') {
     camera.position.copy(layout.position);
     camera.zoom = layout.zoom;
     controls.target.copy(layout.target);
     camera.lookAt(layout.target);
     hasInitializedViewport = true;
+    if (cameraViewMode === 'top') readingLayout = layout;
   }
 
   camera.updateProjectionMatrix();
@@ -212,7 +210,7 @@ function resize() {
 }
 
 function animate() {
-  if (!isCameraResetting && !isPageTransitioning) {
+  if (!activeOverlayPageId && !isCameraResetting && !isPageTransitioning && cameraViewMode === 'default' && !pointerGesture?.returning) {
     clampControlsTarget();
     controls.update();
   }
@@ -229,12 +227,13 @@ function animate() {
 
 window.addEventListener('resize', resize);
 resize();
+if (initialOverlayPageId) openPageOverlay(initialOverlayPageId, { replaceUrl: true });
 animate();
 
 function buildPageGroup(page) {
   const projectNavigation = getProjectNavigation(pagesData.pages, page.id);
   if (projectNavigation) {
-    const backTarget = previousPageId.startsWith('tag:') ? previousPageId : fallbackPageId;
+    const backTarget = galleryBackTarget;
     const gallery = createProjectGallery(pagesData.pages, projectNavigation.categoryId, (projectPage, navigation) =>
       buildSinglePageGroup({
         ...projectPage,
@@ -242,12 +241,10 @@ function buildPageGroup(page) {
       }, { galleryTile: true }),
     );
     for (const [pageId, tile] of gallery.userData.projectTiles) {
-      const active = pageId === page.id;
-      for (const block of getProjectNavigationBlocks(tile)) {
-        block.userData.mesh.userData.skipPageTransition = !active;
-        transitionManager.setGroupProgress(block, active ? 1 : 0);
-      }
+      transitionManager.setProjectTileActive(tile, pageId === page.id);
     }
+    gallery.userData.backTarget = backTarget;
+    recordProjectVisit(gallery, page.id);
     return gallery;
   }
 
@@ -258,7 +255,7 @@ function buildSinglePageGroup(page, { galleryTile = false } = {}) {
   const pageForLayout = isProjectListPage(page)
     ? createProjectsLayoutPage(page)
     : page;
-  const layout = generateLayout(pageForLayout, { isMobile, fillerRings });
+  const layout = generateLayout(pageForLayout, { isMobile: getCurrentCameraDevice() === 'mobile', fillerRings });
   const group = new THREE.Group();
   group.name = `page-${page.id}`;
 
@@ -281,14 +278,19 @@ function createProjectsLayoutPage(page) {
 }
 
 function buildProjectDynamicGroups(page) {
-  const layout = generateLayout(createProjectsLayoutPage(page), { isMobile, fillerRings });
+  const layout = generateLayout(createProjectsLayoutPage(page), { isMobile: getCurrentCameraDevice() === 'mobile', fillerRings });
   return layout
     .filter((blockData) => blockData.carouselDynamic)
     .map((blockData) => createBlock(blockData, textureLoader));
 }
 
 function createProjectCarouselBlocks(page) {
-  const items = getNewestProjectItems(page);
+  const items = getNewestProjectItems(page, pagesData.pages);
+  if (!items.length) return [{
+    id: `${page.id}-empty`, type: 'content', subtype: 'text', carouselDynamic: true,
+    placement: 'center', size: 'wide',
+    content: { text: 'No projects yet.\nThis tag is ready for future work.', fontSize: 0.36, textAlign: 'left', fontWeight: 400 },
+  }];
   const pageCount = Math.max(1, Math.ceil(items.length / projectsPerPage));
   const pageIndex = clampIndex(projectsCarouselPage, pageCount);
   const visibleItems = items.slice(pageIndex * projectsPerPage, pageIndex * projectsPerPage + projectsPerPage);
@@ -348,45 +350,119 @@ async function goToPage(pageId, options = {}) {
     queuedNavigation = { pageId, options };
     return;
   }
-  if (pageId === stateManager.currentPageId) {
-    syncUrlToPage(pageId, { replace: options.replaceUrl ?? false });
+  if (options.historyState) {
+    restoreNavigationPages(options.historyState, pageId, (page) => stateManager.upsertPage(page));
+    galleryBackTarget = getSavedGalleryBackTarget(options.historyState);
+  }
+  if (stateManager.getPage(pageId)?.template === 'overlay') {
+    openPageOverlay(pageId, options);
     return;
   }
-
+  if (!options.preserveOverlay) closePageOverlay();
   const navigation = getProjectNavigation(pagesData.pages, pageId);
   const staysInGallery = navigation && currentGroup.userData.categoryId === navigation.categoryId;
   const lastPageId = stateManager.currentPageId;
+  if (navigation && !options.historyState && !staysInGallery && !options.preservePrevious) {
+    galleryBackTarget = lastPageId.startsWith('tag:') ? lastPageId : fallbackPageId;
+  }
+  if (staysInGallery && currentGroup.userData.backTarget !== galleryBackTarget) {
+    currentGroup.userData.backTarget = galleryBackTarget;
+    updateGroupBackTarget(currentGroup, galleryBackTarget);
+  }
+  if (pageId === lastPageId) {
+    const page = stateManager.getCurrentPage();
+    if (page.backTarget) updateGroupBackTarget(currentGroup, page.backTarget);
+    if (!options.preserveOverlay) syncUrlToPage(pageId, {
+      replace: options.replaceUrl ?? false, historyState: getNavigationHistoryState(page),
+    });
+    return;
+  }
+
   const nextPage = stateManager.goToPage(pageId);
+  pointerGesture = null;
   clearHover();
   if (!options.preservePrevious && !staysInGallery) {
     previousPageId = lastPageId;
   }
-  syncUrlToPage(pageId, { replace: options.replaceUrl ?? false });
+  if (!options.preserveOverlay) syncUrlToPage(pageId, {
+    replace: options.replaceUrl ?? false,
+    historyState: getNavigationHistoryState(nextPage),
+  });
 
-  const wasControlsEnabled = controls.enabled;
   controls.enabled = false;
   isPageTransitioning = true;
 
   try {
+    const previousTarget = getCameraLayout(lastPageId).target;
+    const nextTarget = getCameraLayout().target;
+    const distance = Math.hypot(nextTarget.x - previousTarget.x, nextTarget.z - previousTarget.z);
+    // Home and each category's first tile share the same grid location.
+    // Replace those tiles directly; reserve the grid sequence for actual travel.
+    const gridTravel = distance > 0.02 ? {
+      restoreGrid: () => infiniteGrid.animateExclusions([], { duration: 360 * blockTransitionTimeScale }),
+      moveCamera: () => animateCameraToDefault(Math.min(1800, 650 + distance * 18) * transitionTimeScale * cameraTravelTimeScale),
+      clearGrid: (group) => infiniteGrid.animateExclusions(getBlockFootprints([group]), { duration: 360 * blockTransitionTimeScale }),
+    } : {
+      // A manual pan/rotation/zoom can need correction even at the same tile.
+      // At the default framing this resolves immediately, without a delay.
+      moveCamera: () => animateCameraToDefault(450 * pageSwapTimeScale * blockSwapDurationScale),
+      clearGrid: (group) => infiniteGrid.setExclusions(getBlockFootprints([group])),
+    };
     if (staysInGallery) {
-      // Lower only the navigation; the projects and background stay in place.
-      const distance = controls.target.distanceTo(getCameraLayout().target);
-      await transitionManager.transitionNavigation({
-        oldControls: getProjectNavigationBlocks(currentGroup.userData.projectTiles.get(lastPageId)),
-        newControls: getProjectNavigationBlocks(currentGroup.userData.projectTiles.get(pageId)),
-        moveCamera: () => animateCameraToDefault(Math.min(1800, 650 + distance * 18)),
+      await transitionManager.transitionProjectTile({
+        newTile: currentGroup.userData.projectTiles.get(pageId),
+        moveCamera: () => animateCameraToProject(pageId),
+        clearGrid: () => infiniteGrid.animateExclusions(getBlockFootprints([currentGroup]), { duration: 360 * blockTransitionTimeScale }),
+      });
+      recordProjectVisit(currentGroup, pageId);
+    } else if (currentGroup.userData.categoryId) {
+      const exploringTags = nextPage.template === 'tagDirectory';
+      const firstProjectId = currentGroup.userData.projectTiles.keys().next().value;
+      const firstTile = currentGroup.userData.projectTiles.get(firstProjectId);
+      const returnPlan = getGalleryReturnPlan(currentGroup, lastPageId, getProjectTilePosition(navigation?.index ?? 0));
+      if (exploringTags) {
+        // The first project is a visual waypoint, not an extra history entry.
+        returnPlan.finalTile = firstTile;
+        returnPlan.departures = returnPlan.departures.filter((entry) => entry.tile !== firstTile);
+      }
+      currentGroup = await transitionManager.returnThroughGallery({
+        gallery: currentGroup,
+        returnPlan,
+        newGroupFactory: () => buildPageGroup(nextPage),
+        scene,
+        moveToDestination: (onProgress) => animateGalleryReturn(exploringTags ? firstProjectId : pageId, onProgress),
+        prepareFinalTile: exploringTags ? async (tile) => {
+          if (tile.visible) return;
+          transitionManager.setProjectTileActive(tile, true, 0);
+          await infiniteGrid.animateExclusions(getBlockFootprints([currentGroup]), { duration: 360 * blockTransitionTimeScale });
+          await transitionManager.animateObjects([tile], 'enter', {
+            duration: 260 * blockTransitionTimeScale, stagger: 4 * blockTransitionTimeScale,
+          });
+        } : undefined,
+        restoreGrid: (group) => infiniteGrid.animateExclusions(getBlockFootprints([group]), { duration: 360 * blockTransitionTimeScale }),
+        clearGrid: (group) => infiniteGrid.animateExclusions(getBlockFootprints([group]), { duration: 360 * blockTransitionTimeScale }),
+        updateGrid: (group) => infiniteGrid.setExclusions(getBlockFootprints([group])),
       });
     } else {
       currentGroup = await transitionManager.transitionToPage({
         oldGroup: currentGroup,
         newGroupFactory: () => buildPageGroup(nextPage),
         scene,
-        onTransitionStart: ({ duration }) => animateCameraToDefault(duration),
+        ...gridTravel,
       });
     }
   } finally {
     isPageTransitioning = false;
-    controls.enabled = wasControlsEnabled;
+    if (cameraViewMode === 'top') {
+      readingLayout = {
+        ...getReadingCameraLayout(),
+        position: camera.position.clone(),
+        target: controls.target.clone(),
+        viewSize: currentCameraViewSize,
+        zoom: camera.zoom,
+      };
+    }
+    controls.enabled = !activeOverlayPageId && cameraControlsConfig.enabled && cameraViewMode === 'default';
     syncControlsToCamera();
     if (queuedNavigation) {
       const queued = queuedNavigation;
@@ -396,101 +472,204 @@ async function goToPage(pageId, options = {}) {
   }
 }
 
+function openPageOverlay(pageId, { replaceUrl = false, origin } = {}) {
+  const page = stateManager.getPage(pageId);
+  if (!page?.overlay) return;
+  if (activeOverlayPageId === pageId && modalManager.projectDetails.root.dataset.state === 'open') return;
+  clearHover();
+  pointerGesture = null;
+  syncControlsToCamera();
+  controls.enabled = false;
+  activeOverlayPageId = pageId;
+  const savedBackground = replaceUrl && window.history.state?.pageId === pageId
+    ? stateManager.getPage(window.history.state?.backgroundPageId) : null;
+  const backgroundPageId = savedBackground && savedBackground.template !== 'overlay'
+    ? savedBackground.id : stateManager.currentPageId;
+  const overlayPushed = !replaceUrl || (window.history.state?.pageId === pageId && window.history.state?.overlayPushed === true);
+  syncUrlToPage(pageId, { replace: replaceUrl, historyState: {
+    ...getNavigationHistoryState(stateManager.getPage(backgroundPageId)), backgroundPageId, overlayPushed,
+  } });
+  modalManager.openPage(page.overlay, {
+    origin,
+    onDismiss: () => {
+      // User dismissal owns one history step; route-driven closes never do.
+      activeOverlayPageId = null;
+      controls.enabled = !isPageTransitioning && cameraControlsConfig.enabled && cameraViewMode === 'default';
+      if (getPageIdFromUrl() !== pageId) return;
+      if (overlayPushed) window.history.back();
+      else syncUrlToPage(backgroundPageId, { replace: true, historyState: getNavigationHistoryState(stateManager.getPage(backgroundPageId)) });
+    },
+  });
+  if (backgroundPageId !== stateManager.currentPageId) {
+    // Restore this history entry's background beneath the covering 2D panels.
+    void goToPage(backgroundPageId, { replaceUrl: true, preservePrevious: true, preserveOverlay: true });
+  }
+}
+
+function closePageOverlay() {
+  if (!activeOverlayPageId) return;
+  activeOverlayPageId = null;
+  modalManager.closePage();
+  controls.enabled = cameraControlsConfig.enabled && cameraViewMode === 'default';
+}
+
 function handlePopState() {
   const pageId = getPageIdFromUrl();
   const tag = getTagFromUrl();
-
+  // Capture this entry before a running transition queues the navigation.
+  const options = { replaceUrl: true, historyState: { ...(window.history.state ?? {}) } };
   if (tag) {
-    stateManager.upsertPage(createTagProjectPage(tag, previousPageId));
-    goToPage(getTagPageId(tag), { replaceUrl: true, preservePrevious: true });
+    goToPage(getTagPageId(tag), { ...options, preservePrevious: true });
     return;
   }
-
-  if (pageId && stateManager.getPage(pageId)) {
-    goToPage(pageId, { replaceUrl: true });
-    return;
-  }
-
-  goToPage(fallbackPageId, { replaceUrl: true });
+  goToPage(pageId && stateManager.getPage(pageId) ? pageId : fallbackPageId, options);
 }
 
 function handlePointerMove(event) {
-  if (transitionManager.isTransitioning || isPageTransitioning) {
-    return;
+  const gesture = pointerGesture?.pointerId === event.pointerId ? pointerGesture : null;
+  if (gesture) {
+    const drag = gesture.drag.move(event.clientX, event.clientY);
+    if (gesture.viewMode === 'top') {
+      event.stopImmediatePropagation();
+      event.preventDefault();
+      clearHover();
+      if (gesture.returning) {
+        continueReadingReturnDrag(gesture, event);
+      } else if (drag.released) {
+        beginReadingReturnDrag(gesture, event);
+      } else {
+        applyReadingDrag(drag);
+      }
+      return;
+    }
+    if (!drag.isClick) {
+      clearHover();
+      return;
+    }
   }
-
+  if (transitionManager.isTransitioning || isPageTransitioning || isCameraResetting) return;
   const hit = getInteractiveHit(event);
-
-  if (hit?.object === hoveredMesh) {
-    return;
-  }
-
+  if (hit?.object === hoveredMesh) return;
   clearHover();
-
   if (hit) {
     hoveredMesh = hit.object;
-    hoveredMesh.scale.x = 1.025;
-    hoveredMesh.scale.z = 1.025;
+    // Reading surfaces stay still; only buttons have the hover lift.
+    if (hasBlockAction(hoveredMesh.userData.blockData)
+      && hoveredMesh.userData.blockData.subtype !== 'pageIndicator') {
+      hoveredMesh.position.y += 0.06;
+    }
     document.body.style.cursor = 'pointer';
   }
 }
 
 function handlePointerDown(event) {
-  if (transitionManager.isTransitioning || isPageTransitioning) {
+  if (transitionManager.isTransitioning || isPageTransitioning || isCameraResetting) {
+    event.stopImmediatePropagation();
     return;
   }
+  if (event.button !== 0 || pointerGesture) return;
+  const topView = cameraViewMode === 'top';
+  pointerGesture = {
+    pointerId: event.pointerId,
+    viewMode: cameraViewMode,
+    drag: new ReadingDrag(event.clientX, event.clientY, getCurrentCameraDevice() === 'mobile' ? 64 : 84),
+    hit: getInteractiveHit(event),
+    returning: false,
+  };
+  if (topView) {
+    event.stopImmediatePropagation();
+    event.preventDefault();
+    canvas.setPointerCapture(event.pointerId);
+  }
+}
 
+function handlePointerUp(event) {
+  const gesture = pointerGesture;
+  if (!gesture || gesture.pointerId !== event.pointerId) return;
+  pointerGesture = null;
+  const drag = gesture.drag.move(event.clientX, event.clientY);
+  if (gesture.viewMode === 'top') {
+    event.stopImmediatePropagation();
+    event.preventDefault();
+    if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
+    if (gesture.returning) {
+      continueReadingReturnDrag(gesture, event);
+      finishReadingReturnDrag();
+      return;
+    }
+    if (drag.released) {
+      void leaveReadingView();
+      return;
+    }
+    if (!drag.isClick) {
+      void animateCameraToLayout(readingLayout, 180);
+      return;
+    }
+  }
+  // A drag that starts on a button must never activate that button on release.
+  if (!drag.isClick || isCameraResetting || isPageTransitioning) return;
   const hit = getInteractiveHit(event);
-  const blockData = hit?.object.userData.blockData;
+  if (hit?.object !== gesture.hit?.object) return;
+  activateBlock(hit?.object.userData.blockData, { x: event.clientX, y: event.clientY });
+}
 
-  if (!blockData) {
+function handlePointerCancel(event) {
+  if (pointerGesture?.pointerId !== event.pointerId) return;
+  const gesture = pointerGesture;
+  pointerGesture = null;
+  if (gesture.returning) {
+    finishReadingReturnDrag();
     return;
   }
+  if (gesture.viewMode === 'top' && !gesture.returning && readingLayout && !isCameraResetting) {
+    void animateCameraToLayout(readingLayout, 180);
+  }
+}
 
+function activateBlock(blockData, origin) {
+  if (!blockData) return;
   if (blockData.projectPageId && blockData.projectPageId !== stateManager.currentPageId) {
     goToPage(blockData.projectPageId, { preservePrevious: true });
     return;
   }
-
-  if (blockData.action?.type === 'state') {
-    goToPage(blockData.action.target);
+  if (!hasBlockAction(blockData)) {
+    void enterReadingView();
     return;
   }
-
+  if (blockData.action?.type === 'state') {
+    if (blockData.action.target === 'tags') {
+      goToTagsDirectory();
+      return;
+    }
+    goToPage(blockData.action.target, { origin });
+    return;
+  }
   if (blockData.action?.type === 'project') {
     goToPage(blockData.action.target, { preservePrevious: true });
     return;
   }
-
   if (blockData.action?.type === 'tag') {
     goToTagPage(blockData.action.tag);
     return;
   }
-
   if (blockData.action?.type === 'back') {
     goToPage(blockData.action.target ?? previousPageId, { preservePrevious: true });
     return;
   }
-
-  if (!isPlainTextBlock(blockData)) {
-    animateCameraToDefault(getCameraLerpDuration());
-  }
-
   if (blockData.type === 'moreInfo') {
-    modalManager.openModal(blockData.modal);
+    clearHover();
+    modalManager.openModal(blockData.modal, {
+      projectId: stateManager.currentPageId,
+      projectDetails: stateManager.getCurrentPage().projectDetails,
+      origin,
+      onTag: goToTagPage,
+    });
     return;
   }
-
-  if (isPlainTextBlock(blockData)) {
-    animateCameraToTextBlock();
-    return;
-  }
-
   if (blockData.action?.type === 'carousel') {
     updateProjectsCarousel(blockData.action.direction);
     return;
   }
-
   if (blockData.action?.type === 'link') {
     window.open(blockData.action.url, '_blank', 'noopener,noreferrer');
   }
@@ -502,7 +681,7 @@ async function updateProjectsCarousel(direction) {
   }
 
   const page = stateManager.getCurrentPage();
-  const pageCount = Math.max(1, Math.ceil(getNewestProjectItems(page).length / projectsPerPage));
+  const pageCount = Math.max(1, Math.ceil(getNewestProjectItems(page, pagesData.pages).length / projectsPerPage));
 
   if (pageCount <= 1) {
     return;
@@ -515,6 +694,58 @@ async function updateProjectsCarousel(direction) {
     parent: currentGroup,
     oldChildren: currentGroup.children.filter((child) => child.userData.blockData?.carouselDynamic),
     newChildren: buildProjectDynamicGroups(page),
+    onTransitionStart: () => infiniteGrid.setExclusions(getBlockFootprints([currentGroup])),
+  });
+  infiniteGrid.setExclusions(getBlockFootprints([currentGroup]));
+}
+
+function goToTagsDirectory() {
+  stateManager.upsertPage(createTagsPage(pagesData, { backTarget: stateManager.currentPageId }));
+  goToPage('tags');
+}
+
+function getValidBackTarget(target, fallback = fallbackPageId) {
+  if (typeof target === 'string' && target.startsWith('tag:') && normalizeTag(target.slice(4))) {
+    return getTagPageId(target.slice(4));
+  }
+  return pagesData.pages.some((page) => page.id === target && page.template !== 'overlay') ? target : fallback;
+}
+
+function getSavedGalleryBackTarget(historyState = {}) {
+  const target = getValidBackTarget(historyState.galleryBackTarget);
+  return target.startsWith('tag:') ? target : fallbackPageId;
+}
+
+function restoreNavigationPages(historyState, pageId, upsert) {
+  // The directory's origin differs from a result page's own Back target (Tags).
+  const tagsTarget = getValidBackTarget(historyState.tagsBackTarget
+    ?? (historyState.pageId === 'tags' ? historyState.backTarget : undefined));
+  upsert(createTagsPage(pagesData, { backTarget: tagsTarget === 'tags' ? fallbackPageId : tagsTarget }));
+  const savedGalleryTarget = getSavedGalleryBackTarget(historyState);
+  if (savedGalleryTarget.startsWith('tag:')) {
+    upsert(createTagProjectPage(savedGalleryTarget.slice(4), getValidBackTarget(historyState.galleryTagBackTarget, 'tags')));
+  }
+  const resultPageId = pageId?.startsWith('tag:') ? pageId : historyState.backgroundPageId;
+  if (resultPageId?.startsWith('tag:')) {
+    upsert(createTagProjectPage(resultPageId.slice(4), getValidBackTarget(historyState.backTarget, 'tags')));
+  }
+}
+
+function getNavigationHistoryState(page = stateManager.getCurrentPage()) {
+  return {
+    tagsBackTarget: stateManager.getPage('tags')?.backTarget ?? fallbackPageId,
+    galleryBackTarget,
+    ...(galleryBackTarget.startsWith('tag:') ? {
+      galleryTagBackTarget: stateManager.getPage(galleryBackTarget)?.backTarget ?? 'tags',
+    } : {}),
+    ...(page?.backTarget ? { backTarget: page.backTarget } : {}),
+  };
+}
+
+function updateGroupBackTarget(group, target) {
+  group.traverse((object) => {
+    const action = object.userData.blockData?.action;
+    if (action?.type === 'back') action.target = target;
   });
 }
 
@@ -534,6 +765,7 @@ function createTagProjectPage(tag, backTarget = fallbackPageId) {
   return {
     id: getTagPageId(tag),
     template: 'projectList',
+    backTarget,
     title: tag.toUpperCase(),
     projectItems: matchingItems,
     blocks: [
@@ -553,7 +785,7 @@ function createTagProjectPage(tag, backTarget = fallbackPageId) {
         size: 'wide',
         content: { text: tag.toUpperCase(), fontWeight: 700 },
       },
-      ...createProjectListNavBlocks(getTagPageId(tag)),
+      ...(matchingItems.length > projectsPerPage ? createProjectListNavBlocks(getTagPageId(tag)) : []),
       {
         id: `${getTagPageId(tag)}-home`,
         type: 'interaction',
@@ -608,17 +840,12 @@ function getInteractiveHit(event) {
     return null;
   }
 
-  const blockData = blockHit.object.userData.blockData;
-  const isNeighbor = blockData.projectPageId && blockData.projectPageId !== stateManager.currentPageId;
-  return (isNeighbor && blockData.type !== 'filler') || blockData.type === 'interaction' || blockData.type === 'moreInfo' || isPlainTextBlock(blockData)
-    ? blockHit
-    : null;
+  return blockHit;
 }
 
 function clearHover() {
   if (hoveredMesh) {
-    hoveredMesh.scale.x = 1;
-    hoveredMesh.scale.z = 1;
+    hoveredMesh.position.y = hoveredMesh.userData.originalY;
     hoveredMesh = null;
   }
   document.body.style.cursor = '';
@@ -641,49 +868,31 @@ function applyCameraViewSize(viewSize, aspect = window.innerWidth / window.inner
   camera.updateProjectionMatrix();
 }
 
-function getCameraLayout(currentZoom) {
-  const device = window.innerWidth < 768 ? 'mobile' : 'desktop';
-  const layout = defaultCameraConfig[device];
-  const target = layout.target.clone();
-  const projectNavigation = getProjectNavigation(pagesData.pages, stateManager.currentPageId);
+function getCameraLayout(pageId = stateManager.currentPageId) {
+  const device = getCurrentCameraDevice();
+  const presentation = stateManager.getPage(pageId)?.projectDetails?.presentation;
+  const layout = {
+    ...defaultCameraConfig[device],
+    ...(device === 'mobile' ? presentation?.mobileCamera : {}),
+  };
+  const frame = getViewportCameraFrame(window.innerWidth, window.innerHeight, layout);
+  const target = layout.target.clone().add(frame.targetOffset);
+  const projectNavigation = getProjectNavigation(pagesData.pages, pageId);
   if (projectNavigation) {
     target.add(getProjectTilePosition(projectNavigation.index));
-    target.y = 0.6;
   }
-  const aspect = window.innerWidth / window.innerHeight;
-  const initialZoom = Math.max(layout.zoom, cameraControlsConfig.minZoom);
-  const framingZoom = currentZoom ?? initialZoom;
-  const detailViewSize = Math.max(
-    12.8 * framingZoom,
-    (12.4 * framingZoom) / aspect,
-  );
-  const cameraOffset = getCameraOffsetFromAngles(layout);
-  // Orthographic distance does not change zoom; this prevents the raised grid
-  // from crossing the camera's near plane on tall screens.
-  if (projectNavigation) cameraOffset.multiplyScalar(3);
+  const cameraOffset = getSceneCameraOffset(layout);
 
   return {
     ...layout,
-    // Keep the active project large; neighboring tiles continue outside the frame.
-    viewSize: projectNavigation ? detailViewSize : layout.viewSize,
+    viewSize: frame.viewSize,
     target,
     position: target.clone().add(cameraOffset),
   };
 }
 
-function getPanCameraConfig() {
-  return window.innerWidth < 768 ? panCameraConfig.mobile : panCameraConfig.desktop;
-}
-
-function getCameraOffsetFromAngles({ cameraY, polarAngleDegrees, azimuthAngleDegrees }) {
-  const polarAngle = THREE.MathUtils.degToRad(polarAngleDegrees);
-  const cameraRadius = cameraY / Math.max(0.001, Math.cos(polarAngle));
-
-  return new THREE.Vector3().setFromSphericalCoords(
-    cameraRadius,
-    polarAngle,
-    THREE.MathUtils.degToRad(azimuthAngleDegrees),
-  );
+function getCurrentCameraDevice() {
+  return getCameraDevice(window.innerWidth, window.matchMedia('(pointer: coarse)').matches);
 }
 
 function getInitialPageId() {
@@ -693,6 +902,10 @@ function getInitialPageId() {
   }
 
   const pageId = getPageIdFromUrl();
+  if (pagesData.pages.find((page) => page.id === pageId)?.template === 'overlay') {
+    const background = pagesData.pages.find((page) => page.id === window.history.state?.backgroundPageId && page.template !== 'overlay');
+    return background ? resolveCategoryPageId(pagesData.pages, background.id) : fallbackPageId;
+  }
   return pageId && pagesData.pages.some((page) => page.id === pageId)
     ? resolveCategoryPageId(pagesData.pages, pageId)
     : fallbackPageId;
@@ -717,18 +930,21 @@ function getTagFromUrl() {
   return pageId.slice(4);
 }
 
-function syncUrlToPage(pageId, { replace = false } = {}) {
+function syncUrlToPage(pageId, { replace = false, historyState = {} } = {}) {
   const targetHash = pageId === fallbackPageId ? '#/' : `#/${encodeURIComponent(pageId)}`;
   const targetUrl = `${window.location.pathname}${window.location.search}${targetHash}`;
 
   if (`${window.location.pathname}${window.location.search}${window.location.hash}` === targetUrl) {
+    if (Object.keys(historyState).length) {
+      window.history.replaceState({ pageId, ...historyState }, '', targetUrl);
+    }
     return;
   }
 
   if (replace) {
-    window.history.replaceState({ pageId }, '', targetUrl);
+    window.history.replaceState({ pageId, ...historyState }, '', targetUrl);
   } else {
-    window.history.pushState({ pageId }, '', targetUrl);
+    window.history.pushState({ pageId, ...historyState }, '', targetUrl);
   }
 }
 
@@ -781,25 +997,17 @@ function isProjectListPage(page) {
 
 function getAllProjectItems() {
   const allItems = pagesData.pages
-    .filter(isProjectListPage)
-    .flatMap((page) => getNewestProjectItems(page));
+    .filter((page) => ['projects', 'experiments', 'teaching'].includes(page.id))
+    .flatMap((page) => page.projectItems ?? []);
   const uniqueItems = [...new Map(allItems.map((item) => [item.target, item])).values()];
 
   return uniqueItems.map((item) => {
     const detailPage = pagesData.pages.find((page) => page.id === item.target);
     return {
       ...item,
-      tags: detailPage?.projectDetails?.tags ?? item.tags ?? [],
+      tags: detailPage?.projectDetails ? getProjectTags(detailPage.projectDetails) : item.tags ?? [],
     };
   });
-}
-
-function normalizeTag(tag) {
-  return String(tag)
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
 }
 
 function getTagPageId(tag) {
@@ -807,36 +1015,136 @@ function getTagPageId(tag) {
 }
 
 function animateCameraToDefault(duration) {
-  return animateCameraToLayout(getCameraLayout(camera.zoom), duration);
+  // All pages share this fit: only a user-adjusted camera needs scale correction.
+  return animateCameraToLayout(getNavigationCameraLayout(), duration);
 }
 
-function animateCameraToTextBlock() {
-  const config = getPanCameraConfig();
-  const polarAngle = THREE.MathUtils.degToRad(config.polarAngleDegrees);
-  const cameraRadius = config.cameraY / Math.max(0.001, Math.cos(polarAngle));
-
-  cameraTextTarget.copy(getCameraLayout().target);
-  cameraTextTarget.y = config.targetY;
-
-  cameraTextOffset.setFromSphericalCoords(
-    cameraRadius,
-    polarAngle,
-    THREE.MathUtils.degToRad(config.azimuthAngleDegrees),
-  );
-
+function animateCameraToProject(pageId) {
+  const layout = getNavigationCameraLayout(pageId);
+  const distance = controls.target.distanceTo(layout.target);
   return animateCameraToLayout(
-    {
-      viewSize: config.viewSize,
-      position: cameraTextTarget.clone().add(cameraTextOffset),
-      target: cameraTextTarget.clone(),
-    },
-    getCameraLerpDuration(),
+    layout,
+    Math.min(1800, 650 + distance * 18) * transitionTimeScale * cameraTravelTimeScale,
   );
 }
 
-function animateCameraToLayout(layout, duration) {
+function animateGalleryReturn(pageId, onProgress) {
+  const layout = getNavigationCameraLayout(pageId);
+  const distance = controls.target.distanceTo(layout.target);
+  return animateCameraToLayout(
+    layout,
+    Math.min(2800, 550 + distance * 35) * transitionTimeScale,
+    onProgress,
+  );
+}
+
+function getNavigationCameraLayout(pageId = stateManager.currentPageId) {
+  return cameraViewMode === 'top' ? getReadingCameraLayout(pageId) : getCameraLayout(pageId);
+}
+
+function getReadingCameraLayout(pageId = stateManager.currentPageId) {
+  const page = stateManager.getPage(pageId);
+  const navigation = getProjectNavigation(pagesData.pages, pageId);
+  const tile = currentGroup.userData.projectTiles?.get(pageId)
+    ?? (currentGroup.name === `page-${pageId}` ? currentGroup : null);
+  // Destinations can still be below the grid, or not built yet. Frame their
+  // authored blocks without depending on their current visibility or height.
+  const blocks = tile
+    ? tile.children.map((child) => child.userData.blockData).filter(Boolean)
+    : generateLayout(navigation ? { ...page, projectNavigation: navigation } : page,
+      { isMobile: getCurrentCameraDevice() === 'mobile', fillerRings });
+  const origin = navigation ? getProjectTilePosition(navigation.index) : new THREE.Vector3();
+  const bounds = {
+    minX: Math.min(...blocks.map((block) => block.worldX - (block.worldW + (block.gapX ?? 0.08)) / 2)) + origin.x,
+    maxX: Math.max(...blocks.map((block) => block.worldX + (block.worldW + (block.gapX ?? 0.08)) / 2)) + origin.x,
+    minZ: Math.min(...blocks.map((block) => block.worldZ - (block.worldD + 0.08) / 2)) + origin.z,
+    maxZ: Math.max(...blocks.map((block) => block.worldZ + (block.worldD + 0.08) / 2)) + origin.z,
+    height: Math.max(...blocks.map((block) => block.height)) + 0.08,
+  };
+  return getTopDownCameraLayout(window.innerWidth, window.innerHeight, bounds, getCurrentCameraDevice() === 'mobile');
+}
+
+async function enterReadingView() {
+  if (cameraViewMode === 'top') return;
+  clearHover();
+  syncControlsToCamera();
+  cameraViewMode = 'top';
+  controls.enabled = false;
+  readingLayout = getReadingCameraLayout();
+  await animateCameraToLayout(readingLayout, 480);
+}
+
+function applyReadingDrag(drag) {
+  if (!readingLayout) return;
+  // Only a few pixels of movement get through before the release threshold.
+  const unitsPerPixel = readingLayout.viewSize / readingLayout.zoom / window.innerHeight;
+  const outward = readingLayout.position.clone().sub(readingLayout.target).normalize();
+  const right = new THREE.Vector3(outward.z, 0, -outward.x).normalize();
+  const up = new THREE.Vector3().crossVectors(outward, right);
+  const offset = right.multiplyScalar(-drag.x * unitsPerPixel).addScaledVector(up, -drag.y * unitsPerPixel);
+  controls.target.copy(readingLayout.target).add(offset);
+  camera.position.copy(readingLayout.position).add(offset);
+  camera.lookAt(controls.target);
+}
+
+function beginReadingReturnDrag(gesture, event) {
+  gesture.returning = true;
+  gesture.orbitLayout = getCameraLayout();
+  const spherical = new THREE.Spherical().setFromVector3(
+    gesture.orbitLayout.position.clone().sub(gesture.orbitLayout.target),
+  );
+  gesture.orbitRadius = spherical.radius;
+  gesture.orbit = new ContinuedOrbitDrag(event.clientX, event.clientY, window.innerHeight,
+    spherical.phi, spherical.theta, cameraControlsConfig);
+  void leaveReadingView(gesture);
+}
+
+function getContinuedDragLayout(gesture) {
+  return {
+    ...gesture.orbitLayout,
+    position: new THREE.Vector3().setFromSphericalCoords(
+      gesture.orbitRadius, gesture.orbit.polarAngle, gesture.orbit.azimuthAngle,
+    ).add(gesture.orbitLayout.target),
+  };
+}
+
+function continueReadingReturnDrag(gesture, event) {
+  gesture.orbit.move(event.clientX, event.clientY);
+  if (!isCameraResetting) {
+    const layout = getContinuedDragLayout(gesture);
+    camera.position.copy(layout.position);
+    controls.target.copy(layout.target);
+    camera.lookAt(layout.target);
+  }
+}
+
+function finishReadingReturnDrag() {
+  if (!isCameraResetting) {
+    syncControlsToCamera();
+    controls.enabled = cameraControlsConfig.enabled && !isPageTransitioning;
+  }
+}
+
+async function leaveReadingView(gesture) {
+  clearHover();
+  cameraViewMode = 'default';
+  readingLayout = null;
+  controls.enabled = false;
+  // The destination keeps following the held drag during the tween. After
+  // arrival, that same pointer continues rotating until it is released.
+  await animateCameraToLayout(getCameraLayout(), 420, undefined,
+    gesture ? () => getContinuedDragLayout(gesture) : undefined);
+  controls.enabled = cameraControlsConfig.enabled && !isPageTransitioning
+    && (!gesture || pointerGesture !== gesture);
+}
+
+function animateCameraToLayout(layout, duration, onProgress, getLiveLayout) {
   const startViewSize = currentCameraViewSize;
   const endViewSize = layout.viewSize ?? startViewSize;
+  const changesViewSize = endViewSize !== startViewSize;
+  const startZoom = camera.zoom;
+  const endZoom = layout.zoom ?? startZoom;
+  const changesZoom = endZoom !== startZoom;
 
   cameraStartPosition.copy(camera.position);
   cameraEndPosition.copy(layout.position);
@@ -847,7 +1155,8 @@ function animateCameraToLayout(layout, duration) {
   cameraTargetObject.lookAt(layout.target);
   cameraEndQuaternion.copy(cameraTargetObject.quaternion);
 
-  if (!hasCameraMovedToLayout(startViewSize, endViewSize)) {
+  if (!hasCameraMovedToLayout(startViewSize, endViewSize) && Math.abs(startZoom - endZoom) < 0.001) {
+    onProgress?.(1);
     return Promise.resolve();
   }
 
@@ -862,7 +1171,10 @@ function animateCameraToLayout(layout, duration) {
       camera.position.copy(cameraEndPosition);
       controls.target.copy(cameraEndTarget);
       camera.lookAt(cameraEndTarget);
-      applyCameraViewSize(endViewSize);
+      if (changesViewSize) applyCameraViewSize(endViewSize);
+      camera.zoom = endZoom;
+      camera.updateProjectionMatrix();
+      syncControlsToCamera();
       isCameraResetting = false;
       resolve();
     };
@@ -876,11 +1188,19 @@ function animateCameraToLayout(layout, duration) {
       const progress = Math.min(1, (now - start) / Math.max(1, duration));
       const eased = easeInOutCubic(progress);
 
+      if (getLiveLayout) cameraEndPosition.copy(getLiveLayout().position);
       camera.position.lerpVectors(cameraStartPosition, cameraEndPosition, eased);
       cameraResetTarget.lerpVectors(cameraStartTarget, cameraEndTarget, eased);
       controls.target.copy(cameraResetTarget);
       camera.lookAt(cameraResetTarget);
-      applyCameraViewSize(THREE.MathUtils.lerp(startViewSize, endViewSize, eased));
+      onProgress?.(eased);
+      if (changesViewSize) {
+        applyCameraViewSize(THREE.MathUtils.lerp(startViewSize, endViewSize, eased));
+      }
+      if (changesZoom) {
+        camera.zoom = THREE.MathUtils.lerp(startZoom, endZoom, eased);
+        camera.updateProjectionMatrix();
+      }
 
       if (progress >= 1) {
         finish();
@@ -905,15 +1225,6 @@ function hasCameraMovedToLayout(startViewSize, endViewSize) {
   );
 }
 
-function getCameraLerpDuration() {
-  if (currentGroup.userData.categoryId) return 800;
-  return transitionManager.overlapDelay + transitionManager.getGroupAnimationDuration(currentGroup);
-}
-
-function isPlainTextBlock(blockData) {
-  return blockData.type === 'content' && blockData.subtype === 'text';
-}
-
 function isTopFaceHit(hit) {
   if (!hit.object.userData?.isBlockMesh || !hit.face) {
     return false;
@@ -924,8 +1235,18 @@ function isTopFaceHit(hit) {
 }
 
 function syncControlsToCamera() {
+  // Drain leftover gesture damping without letting it shift the restored view.
+  const position = camera.position.clone();
+  const target = controls.target.clone();
+  const zoom = camera.zoom;
   const wasDampingEnabled = controls.enableDamping;
   controls.enableDamping = false;
+  controls.update();
+  camera.position.copy(position);
+  controls.target.copy(target);
+  camera.zoom = zoom;
+  camera.lookAt(target);
+  camera.updateProjectionMatrix();
   controls.update();
   controls.enableDamping = wasDampingEnabled;
 }
