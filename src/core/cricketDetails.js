@@ -245,6 +245,7 @@ export class ProjectDetails {
         section.appendChild(panel);
       } else if (['image', 'video', 'gallery'].includes(item.type)) {
         if (item.type === 'gallery' && !item.images?.length) continue;
+        if (item.fullWidth) appendRow();
         appendRow(item);
       }
     }

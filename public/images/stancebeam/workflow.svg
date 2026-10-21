@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="650" viewBox="0 0 1600 650" role="img" aria-labelledby="title desc">
+  <title id="title">From ball-tracking data to a broadcast graphic</title>
+  <desc id="desc">StanceBeam supplied the tracking data. Aditya designed the operator console and connected its choices to playback, overlays and camera transitions. Teammates supplied the configurable 3D environment. The result was a clean 1920 by 1080 broadcast output.</desc>
+  <rect width="1600" height="650" fill="#f7f3e8"/>
+  <g font-family="Arial, sans-serif" fill="#111111">
+    <text x="60" y="75" font-size="18" font-weight="700" letter-spacing="2">CONNECTING THE INTERFACE TO THE SCENE</text>
+    <text x="60" y="130" font-size="38" font-weight="700">One prepared graphic. One playback cue.</text>
+    <g stroke="#111111" stroke-width="3">
+      <rect x="60" y="205" width="310" height="255" fill="#f7f3e8"/>
+      <rect x="450" y="205" width="310" height="255" fill="#1f5fbf"/>
+      <rect x="840" y="205" width="310" height="255" fill="#1f5fbf"/>
+      <rect x="1230" y="205" width="310" height="255" fill="#f4c430"/>
+      <path d="M380 330h54m-14-11 14 11-14 11M770 330h54m-14-11 14 11-14 11M1160 330h54m-14-11 14 11-14 11" fill="none"/>
+    </g>
+    <text x="85" y="245" font-size="17" font-weight="700">STANCEBEAM</text>
+    <text x="85" y="305" font-size="30" font-weight="700">Tracking data</text>
+    <text x="85" y="351" font-size="23">Trajectory and delivery</text>
+    <text x="85" y="385" font-size="23">data arrive through</text>
+    <text x="85" y="419" font-size="23">the API.</text>
+    <g fill="#ffffff">
+      <text x="475" y="245" font-size="17" font-weight="700">MY CONTRIBUTION</text>
+      <text x="475" y="305" font-size="30" font-weight="700">Operator console</text>
+      <text x="475" y="351" font-size="23">Select the match data,</text>
+      <text x="475" y="385" font-size="23">graphic and options.</text>
+      <text x="475" y="419" font-size="23">Preview, then prepare.</text>
+      <text x="865" y="245" font-size="17" font-weight="700">MY CONTRIBUTION</text>
+      <text x="865" y="305" font-size="30" font-weight="700">Playback logic</text>
+      <text x="865" y="351" font-size="23">Connect selections to</text>
+      <text x="865" y="385" font-size="23">ball motion, graphics</text>
+      <text x="865" y="419" font-size="23">and camera transitions.</text>
+    </g>
+    <text x="1255" y="245" font-size="17" font-weight="700">BROADCAST OUTPUT</text>
+    <text x="1255" y="305" font-size="30" font-weight="700">1920 × 1080</text>
+    <text x="1255" y="351" font-size="23">Space starts the</text>
+    <text x="1255" y="385" font-size="23">prepared animation.</text>
+    <text x="1255" y="419" font-size="23">No setup controls.</text>
+    <path d="M60 510h1480" stroke="#111111" stroke-width="2"/>
+    <text x="60" y="555" font-size="22" font-weight="700">3D collaboration</text>
+    <text x="60" y="593" font-size="23">My teammates supplied the configurable 3D environment; I connected it to the interface and animation sequence.</text>
+  </g>
+</svg>

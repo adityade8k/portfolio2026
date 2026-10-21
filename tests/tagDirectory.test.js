@@ -13,8 +13,11 @@ const activeIds = ['projects', 'experiments', 'teaching'].flatMap((id) => byId.g
 test('catalog includes all active topic, year and organization tags plus unassigned AI exactly once', () => {
   const page = createTagsPage(data);
   const expected = new Set([...activeIds.flatMap((id) => getProjectTags(byId.get(id).projectDetails)), ...data.unassignedTags].map(normalizeTag));
-  assert.equal(page.tags.length, 39);
+  assert.equal(page.tags.length, 40);
   assert.deepEqual(new Set(page.tags.map((tag) => tag.id)), expected);
+  assert.deepEqual(page.tags.find((tag) => tag.id === 'stancebeam'), {
+    id: 'stancebeam', label: 'StanceBeam', kind: 'organization',
+  });
   assert.equal(page.tags.filter((tag) => tag.id === 'ai').length, 1);
   assert.equal(page.tags.find((tag) => tag.id === 'ai').kind, 'topic');
   assert.equal(page.backTarget, 'home');
@@ -97,7 +100,7 @@ test('an oversized catalog reports a capacity error rather than dropping tags', 
 test('generateLayout maps every directory button into the shared world frame', () => {
   const page = createTagsPage(data);
   const layout = generateLayout(page, { fillerRings: 0 });
-  assert.equal(layout.filter((block) => block.action?.type === 'tag').length, 39);
+  assert.equal(layout.filter((block) => block.action?.type === 'tag').length, 40);
   for (const block of layout) {
     assert.ok(Number.isFinite(block.worldX) && Number.isFinite(block.worldZ));
     assert.ok(block.worldW > 0 && block.worldD > 0);
